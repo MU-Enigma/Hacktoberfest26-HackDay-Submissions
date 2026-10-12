@@ -164,8 +164,8 @@ def scan_qr(machine_id):
     resp = None
 
     if request.method == 'POST':
-        name = request.form.get('name').strip()
-        phone = request.form.get('phone').strip()
+        name = request.form.get('name', '').strip()
+        phone = request.form.get('phone', '').strip()
         action = request.form.get('action')
         now = datetime.now()
         
@@ -208,7 +208,9 @@ def scan_qr(machine_id):
             message = "✨ Clothes removed! Machine is squeaky clean and available."
 
         # Set cookies to remember user across pages
-        resp = make_response(render_template_string(MACHINE_TEMPLATE, machine=conn.execute("SELECT * FROM machines WHERE id = ?", (machine_id,)).fetchone(), queue=conn.execute("SELECT * FROM queue WHERE status IN ('Waiting', 'Notified') ORDER BY joined_at ASC").fetchall(), message=message, default_name=name, default_phone=phone))
+        updated_machine = conn.execute("SELECT * FROM machines WHERE id = ?", (machine_id,)).fetchone()
+        updated_queue = conn.execute("SELECT * FROM queue WHERE status IN ('Waiting', 'Notified') ORDER BY joined_at ASC").fetchall()
+        resp = make_response(render_template_string(MACHINE_TEMPLATE, machine=updated_machine, queue=updated_queue, message=message, default_name=name, default_phone=phone))
         resp.set_cookie('laundry_user_name', name, max_age=60*60*24*30)
         resp.set_cookie('laundry_user_phone', phone, max_age=60*60*24*30)
         conn.close()
@@ -337,7 +339,7 @@ DASHBOARD_TEMPLATE = """
                         <p class="text-xs text-rose-600 mt-0.5 font-extrabold animate-pulse">⏰ Expires in 5 mins!</p>
                     {% else %}
                         <p class="text-xs text-slate-400 italic">Drum is empty & ready for load</p>
-                    {% endif %}
+                    <% endif %}
                 </div>
             </div>
             {% endfor %}
@@ -450,8 +452,8 @@ MACHINE_TEMPLATE = """
                         ❌ Leave Queue
                     </button>
 
-                    {% if machine.status == 'Idle' %}
-                        <button type="submit" name="action" value="clear" class="w-full py-3 bg-rose-500 hover:bg-rose-600 text-white font-black rounded-xl text-sm shadow-md transition transform hover: -translate-y-0.5">
+                    {% if machine.status in ['In-Use', 'Idle'] %}
+                        <button type="submit" name="action" value="clear" class="w-full py-3 bg-rose-500 hover:bg-rose-600 text-white font-black rounded-xl text-sm shadow-md transition transform hover:-translate-y-0.5">
                             ✨ Emptied / Ready for Next Load
                         </button>
                     {% endif %}
