@@ -1,3 +1,4 @@
+
 from flask import Flask, request, render_template_string, make_response, redirect
 from datetime import datetime, timedelta
 import sqlite3
@@ -296,11 +297,11 @@ DASHBOARD_TEMPLATE = """
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
             {% for m in machines %}
-            <div class="bg-white/90 backdrop-blur rounded-3xl p-5 shadow-lg border-2 
+            <a href="/machine/{{m.id}}" class="bg-white/90 backdrop-blur rounded-3xl p-5 shadow-lg border-2 
                 {% if m.status == 'In-Use' %} border-sky-400 ring-4 ring-sky-100 
                 {% elif m.status == 'Available' %} border-emerald-300 
                 {% elif m.status == 'Idle' %} border-rose-300 
-                {% else %} border-amber-300 {% endif %} relative flex flex-col justify-between">
+                {% else %} border-amber-300 {% endif %} relative flex flex-col justify-between transition transform hover:-translate-y-1 hover:shadow-xl cursor-pointer">
                 
                 <div>
                     <div class="flex items-center justify-between mb-3">
@@ -330,18 +331,19 @@ DASHBOARD_TEMPLATE = """
                     {% if m.status == 'In-Use' %}
                         <p class="text-slate-700 font-semibold">User: <strong class="text-slate-900">{{m.current_user_name}}</strong></p>
                         <p class="text-sky-600 font-bold mt-1 flex items-center gap-1">⏱️ {{ format_elapsed(m.start_time) }}</p>
-                        <p class="text-xs text-slate-500 mt-1">📞 <a href="tel:{{m.current_user_phone}}" class="underline font-bold text-sky-700">{{m.current_user_phone}}</a></p>
+                        <p class="text-xs text-slate-500 mt-1">📞 <span class="underline font-bold text-sky-700">{{m.current_user_phone}}</span></p>
                     {% elif m.status == 'Idle' %}
                         <p class="text-rose-600 font-bold text-xs">🔔 Unload Needed!</p>
-                        <p class="text-slate-600 text-xs mt-1">{{m.current_user_name}} (📞 <a href="tel:{{m.current_user_phone}}" class="underline">{{m.current_user_phone}}</a>)</p>
+                        <p class="text-slate-600 text-xs mt-1">{{m.current_user_name}} (📞 <span class="underline">{{m.current_user_phone}}</span>)</p>
                     {% elif m.status == 'Reserved' %}
                         <p class="text-amber-700 text-xs font-bold">Reserved for {{m.reserved_for_name}}</p>
                         <p class="text-xs text-rose-600 mt-0.5 font-extrabold animate-pulse">⏰ Expires in 5 mins!</p>
                     {% else %}
                         <p class="text-xs text-slate-400 italic">Drum is empty & ready for load</p>
                     {% endif %}
+                    <div class="mt-3 text-right text-xs font-bold text-sky-600">Tap to manage ➔</div>
                 </div>
-            </div>
+            </a>
             {% endfor %}
         </div>
 
@@ -367,17 +369,6 @@ DASHBOARD_TEMPLATE = """
                 <li class="py-6 text-center text-sky-600/70 font-medium text-sm">No clothes waiting in queue right now!</li>
                 {% endfor %}
             </ul>
-        </section>
-
-        <section class="bg-sky-900 text-white rounded-3xl p-6 text-center shadow-xl">
-            <h3 class="text-xs font-bold text-sky-300 uppercase tracking-widest mb-3">🫧 Pick Your Washing Machine 🧼</h3>
-            <div class="flex flex-wrap justify-center gap-3">
-                {% for m in machines %}
-                    <a href="/machine/{{m.id}}" class="bg-sky-500 hover:bg-sky-400 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow transition transform hover:-translate-y-0.5 active:translate-y-0">
-                        {{m.name}}
-                    </a>
-                {% endfor %}
-            </div>
         </section>
     </div>
 </body>
