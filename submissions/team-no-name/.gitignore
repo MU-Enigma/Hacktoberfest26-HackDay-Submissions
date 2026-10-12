@@ -1,0 +1,38 @@
+# Python caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environments
+.env
+.venv/
+env/
+venv/
+ENV/
+.python-version
+
+# Databases & local data
+sorts.db
+*.db
+*.sqlite
+
+# University-specific data files — live in Supabase after first migration.
+# Keep these files locally / on Render for the one-time seed run, then they
+# are no longer needed (data persists in the database).
+sorts/assets/data/mahindra_seed.json
+sorts/assets/data/mahindra_clubs.html
+sorts/assets/data/verified_clubs.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
