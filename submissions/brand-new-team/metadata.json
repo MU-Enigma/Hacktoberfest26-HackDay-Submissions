@@ -1,0 +1,6 @@
+{
+  "name": "FinStreak - AI PhonePe Statement & Smart Budget Manager",
+  "description": "Analyze PhonePe UPI bank statements with AI, auto-categorize expenses, set custom budgets, track daily safe spending streaks, and manage savings goals with biometric lock.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
