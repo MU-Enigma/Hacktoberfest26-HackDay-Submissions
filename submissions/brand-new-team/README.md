@@ -1,6 +1,5 @@
 # Team submissions
 
-# Team submissions
 # Wispend
 
 ## Team
