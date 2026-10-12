@@ -1,0 +1,302 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paani Police</title>
+<style>
+  @font-face{font-family:WaterSplash;src:url("WaterSplash.ttf") format("truetype");font-display:swap}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{position:relative;margin:0;min-height:100vh;font-family:"Helvetica Neue",Arial,sans-serif;color:#fff;text-align:center;
+    background:#14292d;
+    background-image:radial-gradient(ellipse at 20% 10%,#2a4a50 0,transparent 55%),radial-gradient(ellipse at 85% 90%,#0e1d21 0,transparent 55%),repeating-radial-gradient(circle at 50% 50%,#ffffff05 0 2px,transparent 2px 5px);
+    background-attachment:fixed}
+
+  .bubble-field{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+  .bubble{position:absolute;left:var(--x);top:var(--y);width:var(--size);height:var(--size);border-radius:50%;border:1px solid #eafcff99;background:radial-gradient(circle at 31% 25%,#ffffffdd 0 4%,#e7fbff88 8%,#bdeef522 43%,#e9fcff35 66%,#ffffff08 73%);box-shadow:inset -3px -4px 9px #a9e8f522,inset 2px 3px 7px #ffffff55,0 0 14px #c9f7ff33;opacity:.64;animation:bubbleFloat var(--duration) ease-in-out var(--delay) infinite alternate}
+  @keyframes bubbleFloat{to{transform:translate3d(3px,-13px,0)}}
+  /* ---------- APP ---------- */
+  .wrap{position:relative;z-index:1;max-width:460px;margin:auto;padding:32px 18px 40px}
+  h1{margin:8px 0 2px;font-family:WaterSplash,Arial,sans-serif;font-size:clamp(42px,12vw,60px);line-height:1.12;letter-spacing:1px;color:#7fe0e8;text-shadow:0 3px 0 #0a4d68,0 0 24px #27b5c088;width:100%}
+  .sub{color:#b9e7ec;margin-top:4px}
+  select,input{width:100%;padding:12px;border-radius:10px;border:1px solid #5fd0d555;background:#12333b;color:#fff;font-size:16px;margin:8px 0}
+  select option{background:#12333b;color:#fff}
+  .status{font-size:clamp(21px,6vw,28px);font-weight:bold;padding:26px 10px;border-radius:18px;margin:12px 0 6px;transition:.4s;box-shadow:0 8px 28px #02061788}
+  .none{background:#334155}.good{background:#16a34a}.cold{background:#dc2626}
+  #msg{min-height:44px;font-size:16px;margin-bottom:10px;color:#b9e7ec;line-height:1.5}
+  .btns{display:flex;gap:8px}
+  .btns button{flex:1;padding:16px 4px;font-size:16px;border:1px solid #5fd0d555;border-radius:12px;background:#17434d;color:#fff;cursor:pointer;box-shadow:0 5px 18px #02061766}
+  .btns button.hot{background:#c93636;border-color:#ff8b8b88}
+  .btns button.cold{background:#176ca8;border-color:#7dc8ff99}
+  .btns button:active{transform:scale(.95)}
+  ul{list-style:none;padding:0;text-align:left}
+  li{background:#12333b;border:1px solid #5fd0d533;padding:10px 12px;border-radius:10px;margin:6px 0;font-size:15px}
+  li small{color:#b9e7ec}
+  #toast{position:fixed;top:-120px;left:10px;right:10px;background:#fff;color:#000;padding:16px;border-radius:14px;font-weight:bold;transition:.5s;box-shadow:0 8px 30px #0008;z-index:99}
+  #toast.show{top:12px}
+</style>
+</head>
+<body>
+<div class="bubble-field" aria-hidden="true">
+  <i class="bubble" style="--x:3%;--y:8%;--size:22px;--duration:7s;--delay:-2s"></i>
+  <i class="bubble" style="--x:12%;--y:19%;--size:14px;--duration:9s;--delay:-5s"></i>
+  <i class="bubble" style="--x:5%;--y:34%;--size:30px;--duration:8s;--delay:-3s"></i>
+  <i class="bubble" style="--x:15%;--y:48%;--size:18px;--duration:10s;--delay:-7s"></i>
+  <i class="bubble" style="--x:4%;--y:66%;--size:24px;--duration:8s;--delay:-4s"></i>
+  <i class="bubble" style="--x:13%;--y:84%;--size:12px;--duration:11s;--delay:-6s"></i>
+  <i class="bubble" style="--x:94%;--y:11%;--size:17px;--duration:9s;--delay:-3s"></i>
+  <i class="bubble" style="--x:86%;--y:25%;--size:28px;--duration:8s;--delay:-6s"></i>
+  <i class="bubble" style="--x:96%;--y:42%;--size:13px;--duration:10s;--delay:-2s"></i>
+  <i class="bubble" style="--x:88%;--y:57%;--size:20px;--duration:7s;--delay:-5s"></i>
+  <i class="bubble" style="--x:95%;--y:76%;--size:27px;--duration:9s;--delay:-4s"></i>
+  <i class="bubble" style="--x:85%;--y:91%;--size:15px;--duration:11s;--delay:-7s"></i>
+  <i class="bubble" style="--x:1%;--y:3%;--size:10px;--duration:8s;--delay:-1s"></i>
+  <i class="bubble" style="--x:9%;--y:5%;--size:18px;--duration:10s;--delay:-4s"></i>
+  <i class="bubble" style="--x:17%;--y:12%;--size:11px;--duration:9s;--delay:-3s"></i>
+  <i class="bubble" style="--x:2%;--y:22%;--size:16px;--duration:7s;--delay:-5s"></i>
+  <i class="bubble" style="--x:19%;--y:27%;--size:21px;--duration:11s;--delay:-2s"></i>
+  <i class="bubble" style="--x:8%;--y:30%;--size:9px;--duration:8s;--delay:-6s"></i>
+  <i class="bubble" style="--x:1%;--y:40%;--size:23px;--duration:10s;--delay:-2s"></i>
+  <i class="bubble" style="--x:18%;--y:39%;--size:13px;--duration:9s;--delay:-7s"></i>
+  <i class="bubble" style="--x:10%;--y:57%;--size:25px;--duration:8s;--delay:-3s"></i>
+  <i class="bubble" style="--x:2%;--y:53%;--size:11px;--duration:12s;--delay:-6s"></i>
+  <i class="bubble" style="--x:19%;--y:63%;--size:16px;--duration:9s;--delay:-4s"></i>
+  <i class="bubble" style="--x:8%;--y:72%;--size:20px;--duration:7s;--delay:-1s"></i>
+  <i class="bubble" style="--x:1%;--y:80%;--size:12px;--duration:10s;--delay:-5s"></i>
+  <i class="bubble" style="--x:18%;--y:92%;--size:24px;--duration:8s;--delay:-3s"></i>
+  <i class="bubble" style="--x:10%;--y:97%;--size:9px;--duration:11s;--delay:-7s"></i>
+  <i class="bubble" style="--x:98%;--y:4%;--size:12px;--duration:8s;--delay:-4s"></i>
+  <i class="bubble" style="--x:90%;--y:7%;--size:24px;--duration:10s;--delay:-2s"></i>
+  <i class="bubble" style="--x:82%;--y:18%;--size:10px;--duration:9s;--delay:-6s"></i>
+  <i class="bubble" style="--x:98%;--y:29%;--size:19px;--duration:7s;--delay:-3s"></i>
+  <i class="bubble" style="--x:81%;--y:35%;--size:14px;--duration:11s;--delay:-5s"></i>
+  <i class="bubble" style="--x:91%;--y:37%;--size:9px;--duration:8s;--delay:-7s"></i>
+  <i class="bubble" style="--x:98%;--y:49%;--size:22px;--duration:10s;--delay:-1s"></i>
+  <i class="bubble" style="--x:82%;--y:47%;--size:18px;--duration:9s;--delay:-4s"></i>
+  <i class="bubble" style="--x:91%;--y:68%;--size:11px;--duration:8s;--delay:-6s"></i>
+  <i class="bubble" style="--x:98%;--y:62%;--size:16px;--duration:12s;--delay:-2s"></i>
+  <i class="bubble" style="--x:82%;--y:72%;--size:23px;--duration:10s;--delay:-5s"></i>
+  <i class="bubble" style="--x:90%;--y:83%;--size:13px;--duration:7s;--delay:-3s"></i>
+  <i class="bubble" style="--x:98%;--y:88%;--size:20px;--duration:9s;--delay:-7s"></i>
+  <i class="bubble" style="--x:81%;--y:97%;--size:10px;--duration:11s;--delay:-1s"></i>  <i class="bubble" style="--x:1%;--y:8%;--size:9px;--duration:7s;--delay:0s"></i>
+  <i class="bubble" style="--x:5%;--y:25%;--size:16px;--duration:8s;--delay:-3s"></i>
+  <i class="bubble" style="--x:11%;--y:42%;--size:23px;--duration:9s;--delay:-6s"></i>
+  <i class="bubble" style="--x:17%;--y:59%;--size:30px;--duration:10s;--delay:0s"></i>
+  <i class="bubble" style="--x:82%;--y:76%;--size:14px;--duration:11s;--delay:-3s"></i>
+  <i class="bubble" style="--x:87%;--y:93%;--size:21px;--duration:12s;--delay:-6s"></i>
+  <i class="bubble" style="--x:93%;--y:14%;--size:28px;--duration:7s;--delay:0s"></i>
+  <i class="bubble" style="--x:98%;--y:31%;--size:12px;--duration:8s;--delay:-3s"></i>
+  <i class="bubble" style="--x:1%;--y:48%;--size:19px;--duration:9s;--delay:-6s"></i>
+  <i class="bubble" style="--x:5%;--y:65%;--size:26px;--duration:10s;--delay:0s"></i>
+  <i class="bubble" style="--x:11%;--y:82%;--size:10px;--duration:11s;--delay:-3s"></i>
+  <i class="bubble" style="--x:17%;--y:3%;--size:17px;--duration:12s;--delay:-6s"></i>
+  <i class="bubble" style="--x:82%;--y:20%;--size:24px;--duration:7s;--delay:0s"></i>
+  <i class="bubble" style="--x:87%;--y:37%;--size:31px;--duration:8s;--delay:-3s"></i>
+  <i class="bubble" style="--x:93%;--y:54%;--size:15px;--duration:9s;--delay:-6s"></i>
+  <i class="bubble" style="--x:98%;--y:71%;--size:22px;--duration:10s;--delay:0s"></i>
+  <i class="bubble" style="--x:1%;--y:88%;--size:29px;--duration:11s;--delay:-3s"></i>
+  <i class="bubble" style="--x:5%;--y:9%;--size:13px;--duration:12s;--delay:-6s"></i>
+  <i class="bubble" style="--x:11%;--y:26%;--size:20px;--duration:7s;--delay:0s"></i>
+  <i class="bubble" style="--x:17%;--y:43%;--size:27px;--duration:8s;--delay:-3s"></i>
+  <i class="bubble" style="--x:82%;--y:60%;--size:11px;--duration:9s;--delay:-6s"></i>
+  <i class="bubble" style="--x:87%;--y:77%;--size:18px;--duration:10s;--delay:0s"></i>
+  <i class="bubble" style="--x:93%;--y:94%;--size:25px;--duration:11s;--delay:-3s"></i>
+  <i class="bubble" style="--x:98%;--y:15%;--size:9px;--duration:12s;--delay:-6s"></i>
+  <i class="bubble" style="--x:1%;--y:32%;--size:16px;--duration:7s;--delay:0s"></i>
+  <i class="bubble" style="--x:5%;--y:49%;--size:23px;--duration:8s;--delay:-3s"></i>
+  <i class="bubble" style="--x:11%;--y:66%;--size:30px;--duration:9s;--delay:-6s"></i>
+  <i class="bubble" style="--x:17%;--y:83%;--size:14px;--duration:10s;--delay:0s"></i>
+  <i class="bubble" style="--x:82%;--y:4%;--size:21px;--duration:11s;--delay:-3s"></i>
+  <i class="bubble" style="--x:87%;--y:21%;--size:28px;--duration:12s;--delay:-6s"></i>
+</div>
+
+
+<main id="app" class="wrap">
+<h1>Paani Police</h1>
+  <p class="sub">is it the time to get yourself wet?</p>
+
+  <select id="block" onchange="blockChanged()">
+    <option>Phase 4A</option><option>Phase 4B</option><option>Phase 2</option><option>Phase 3</option>
+  </select>
+
+  <div id="status" class="status none">...</div>
+  <div id="msg"></div>
+
+  <h3>How is the water RIGHT NOW?</h3>
+  <input id="name" placeholder="Your name (needed for the 30-minute limit)" maxlength="40" autocomplete="name" required>
+  <div class="btns">
+    <button class="hot" onclick="addReview('good')">🔥<br>Hot</button>
+    <button class="cold" onclick="addReview('cold')">🧊<br>Cold / dirty</button>
+  </div>
+
+  <h3>Latest reports</h3>
+  <ul id="feed"></ul>
+</main>
+<div id="toast"></div>
+
+<script>
+const KEY = "showerRadarReviews";
+const COOLDOWN = 30 * 60 * 1000;
+const LABEL = {good:"🔥 Hot & clean", cold:"🧊 Cold / dirty"};
+const POPUP = {
+  good:"Hot water is here. Go get yourself wet! ✅",
+  cold:"Cold or dirty water! Proceed at your own risk 🧊"
+};
+
+let reviews = load();
+let lastStatus = null;
+
+function load(){
+  try{
+    const saved = JSON.parse(localStorage.getItem(KEY)) || [];
+    return saved.map(r => r.type === "hard" ? {...r, type:"cold"} : r);
+  }catch(e){ return []; }
+}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(reviews)); }catch(e){} }
+function block(){ return document.getElementById("block").value; }
+function cleanName(value){ return value.trim().replace(/\s+/g, " "); }
+function nameKey(value){ return cleanName(value).toLocaleLowerCase(); }
+function cooldownFor(name){
+  const cutoff = Date.now() - COOLDOWN;
+  return reviews.find(r => !r.demo && nameKey(r.name || "") === nameKey(name) && r.time > cutoff);
+}
+function remainingMinutes(review){
+  return Math.max(1, Math.ceil((COOLDOWN - (Date.now() - review.time)) / 60000));
+}
+
+function getBlockStats(){
+  const cutoff = Date.now() - COOLDOWN;
+  const votes = reviews.filter(r => r.block===block() && r.time >= cutoff && (r.type==="good" || r.type==="cold"));
+  const good = votes.filter(r => r.type==="good").length;
+  const cold = votes.length - good;
+  const latest = votes[votes.length - 1];
+  const winner = good === cold ? (latest ? latest.type : null) : (good > cold ? "good" : "cold");
+  return {
+    good,
+    cold,
+    total:votes.length,
+    goodPercent:votes.length ? Math.round(good / votes.length * 100) : 0,
+    coldPercent:votes.length ? Math.round(cold / votes.length * 100) : 0,
+    winner
+  };
+}
+function getStatus(){ return getBlockStats().winner; }
+function randomizeBubbles(){
+  const field = document.querySelector(".bubble-field");
+  const buttons = document.querySelector(".btns");
+  if(!field || !buttons) return;
+  field.querySelectorAll(".button-bubble").forEach(bubble => bubble.remove());
+  field.querySelectorAll(".bubble").forEach((bubble, index) => {
+    const x = index % 2 === 0 ? Math.random() * 19 : 81 + Math.random() * 19;
+    bubble.style.setProperty("--x", x + "%");
+    bubble.style.setProperty("--y", Math.random() * 96 + "%");
+    bubble.style.setProperty("--size", (9 + Math.random() * 24) + "px");
+    bubble.style.setProperty("--duration", (7 + Math.random() * 6) + "s");
+    bubble.style.setProperty("--delay", (-Math.random() * 8) + "s");
+  });
+  const rect = buttons.getBoundingClientRect();
+  const pageLeft = rect.left + window.scrollX;
+  const pageTop = rect.top + window.scrollY;
+  for(let i = 0; i < 22; i++){
+    const bubble = document.createElement("i");
+    bubble.className = "bubble button-bubble";
+    bubble.style.setProperty("--x", (pageLeft - 48 + Math.random() * (rect.width + 96)) + "px");
+    bubble.style.setProperty("--y", (pageTop - 55 + Math.random() * (rect.height + 110)) + "px");
+    bubble.style.setProperty("--size", (8 + Math.random() * 22) + "px");
+    bubble.style.setProperty("--duration", (6 + Math.random() * 7) + "s");
+    bubble.style.setProperty("--delay", (-Math.random() * 8) + "s");
+    field.appendChild(bubble);
+  }
+}
+function ago(t){
+  const m = Math.round((Date.now()-t)/60000);
+  return m<1 ? "just now" : m<60 ? m+" min ago" : Math.round(m/60)+" hr ago";
+}
+
+function render(){
+  const stats = getBlockStats();
+  const s = stats.winner;
+  const box = document.getElementById("status");
+  const msg = document.getElementById("msg");
+  box.className = "status " + (s || "none");
+  if(!s){
+    box.textContent = "No reports yet 🤷";
+    msg.textContent = "Be the first to report for this phase!";
+  }else{
+    box.textContent = (s === "good" ? "HOT & GOOD FOR SHOWERING" : "COLD / DIRTY") + " · " + (s === "good" ? stats.goodPercent : stats.coldPercent) + "%";
+    msg.textContent = "Overall from " + stats.total + " reports: Hot " + stats.goodPercent + "% (" + stats.good + "), Cold / dirty " + stats.coldPercent + "% (" + stats.cold + ").";
+  }
+
+  const feed = document.getElementById("feed");
+  feed.innerHTML = "";
+  reviews.filter(r => r.block===block() && r.time >= Date.now() - COOLDOWN).slice(-8).reverse().forEach(r => {
+    const li = document.createElement("li");
+    li.textContent = LABEL[r.type] + " — " + r.name + " ";
+    const sm = document.createElement("small");
+    sm.textContent = "(" + ago(r.time) + ")";
+    li.appendChild(sm);
+    feed.appendChild(li);
+  });
+}
+
+function addReview(type){
+  const nameInput = document.getElementById("name");
+  const name = cleanName(nameInput.value);
+  if(!name){ nameInput.focus(); alert("Enter your name so the 30-minute limit can work."); return; }
+  if(type !== "good" && type !== "cold") return;
+  const previous = cooldownFor(name);
+  if(previous){ alert("You already reported recently. Try again in about " + remainingMinutes(previous) + " minute(s)."); return; }
+  askPermission();
+  reviews.push({type, name, block:block(), time:Date.now()});
+  save();
+  const s = getStatus();
+  render();
+  if(s !== lastStatus){ lastStatus = s; if(s) notify(s); }
+}
+
+function blockChanged(){ lastStatus = getStatus(); render(); }
+
+
+function notify(s){
+  const t = document.getElementById("toast");
+  t.textContent = POPUP[s];
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 4000);
+  if(navigator.vibrate) navigator.vibrate([200,100,200]);
+  beep();
+  try{
+    if("Notification" in window && Notification.permission==="granted")
+      new Notification("Paani Police", {body:POPUP[s]});
+  }catch(e){}
+}
+
+function askPermission(){
+  try{ if("Notification" in window && Notification.permission==="default") Notification.requestPermission(); }catch(e){}
+}
+
+function beep(){
+  try{
+    const a = new (window.AudioContext || window.webkitAudioContext)();
+    const o = a.createOscillator();
+    o.connect(a.destination); o.frequency.value = 660;
+    o.start(); o.stop(a.currentTime + 0.25);
+  }catch(e){}
+}
+
+randomizeBubbles();
+window.addEventListener("resize", randomizeBubbles);
+lastStatus = getStatus();
+render();
+setInterval(render, 30000);
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
