@@ -192,34 +192,38 @@ DASHBOARD_TEMPLATE = """
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @keyframes floatBubble {
-            0% { transform: translateY(0) scale(1); opacity: 0.7; }
-            50% { opacity: 0.3; }
-            100% { transform: translateY(-100px) scale(1.3); opacity: 0; }
+            0% { transform: translateY(0) scale(1); opacity: 0.8; }
+            50% { opacity: 0.4; }
+            100% { transform: translateY(-120px) scale(1.4); opacity: 0; }
         }
         .bubble {
             position: absolute;
-            background: rgba(255, 255, 255, 0.6);
-            border: 1px solid rgba(186, 230, 253, 0.8);
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.9), rgba(186, 230, 253, 0.4));
+            border: 1px solid rgba(255, 255, 255, 0.8);
             border-radius: 50%;
             pointer-events: none;
-            animation: floatBubble 4s infinite ease-in-out;
+            box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.8);
+            animation: floatBubble 5s infinite ease-in-out;
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-sky-100 via-cyan-50 to-blue-100 text-slate-800 min-h-screen p-4 sm:p-8 relative overflow-x-hidden">
-    <div class="bubble w-6 h-6 top-10 left-10" style="animation-delay: 0s;"></div>
-    <div class="bubble w-10 h-10 top-40 right-12" style="animation-delay: 1.5s;"></div>
-    <div class="bubble w-4 h-4 bottom-20 left-1/4" style="animation-delay: 2.2s;"></div>
+<body class="bg-gradient-to-tr from-sky-200 via-cyan-100 to-indigo-100 text-slate-800 min-h-screen p-4 sm:p-8 relative overflow-x-hidden">
+    <!-- Extra bubbly background elements -->
+    <div class="bubble w-8 h-8 top-12 left-8" style="animation-delay: 0s;"></div>
+    <div class="bubble w-12 h-12 top-32 right-16" style="animation-delay: 1.2s;"></div>
+    <div class="bubble w-6 h-6 top-64 left-1/3" style="animation-delay: 2.5s;"></div>
+    <div class="bubble w-10 h-10 bottom-24 right-1/4" style="animation-delay: 0.8s;"></div>
+    <div class="bubble w-5 h-5 bottom-12 left-16" style="animation-delay: 3.1s;"></div>
 
     <div class="max-w-3xl mx-auto relative z-10">
         <header class="text-center mb-8">
-            <span class="bg-sky-200/80 text-sky-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-sm">
-                🧼 Mahindra University Hostel
+            <span class="bg-sky-200/90 text-sky-900 text-xs font-extrabold px-3.5 py-1.5 rounded-full uppercase tracking-widest shadow-sm">
+                🫧 Phase 4A Hostel
             </span>
             <h1 class="text-4xl font-extrabold mt-3 tracking-tight text-sky-950 flex items-center justify-center gap-2">
-                🫧 Washing MUchine Live
+                🧼 Washing MUchine Live
             </h1>
-            <p class="text-sm text-sky-700 font-medium mt-1">Real-time Laundry Hub • Auto-refreshes every 30s</p>
+            <p class="text-sm text-sky-800 font-semibold mt-1">Real-time Laundry Hub • Auto-refreshes every 30s</p>
         </header>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
@@ -298,11 +302,11 @@ DASHBOARD_TEMPLATE = """
         </section>
 
         <section class="bg-sky-900 text-white rounded-3xl p-6 text-center shadow-xl">
-            <h3 class="text-xs font-bold text-sky-300 uppercase tracking-widest mb-3">📱 Hackathon QR Code Simulators</h3>
+            <h3 class="text-xs font-bold text-sky-300 uppercase tracking-widest mb-3">🫧 Pick Your Washing Machine 🧼</h3>
             <div class="flex flex-wrap justify-center gap-3">
                 {% for m in machines %}
                     <a href="/machine/{{m.id}}" class="bg-sky-500 hover:bg-sky-400 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow transition transform hover:-translate-y-0.5 active:translate-y-0">
-                        Scan QR: {{m.name}}
+                        {{m.name}}
                     </a>
                 {% endfor %}
             </div>
@@ -322,7 +326,7 @@ MACHINE_TEMPLATE = """
     <link rel="icon" href="https://fav.farm/🧺">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gradient-to-br from-sky-100 via-cyan-50 to-blue-100 text-slate-800 min-h-screen flex items-center justify-center p-4">
+<body class="bg-gradient-to-tr from-sky-200 via-cyan-100 to-indigo-100 text-slate-800 min-h-screen flex items-center justify-center p-4">
     <div class="bg-white/95 backdrop-blur w-full max-w-md rounded-3xl shadow-xl border border-sky-100 p-6 text-center relative overflow-hidden">
         
         <div class="w-16 h-16 rounded-full border-4 border-sky-200 bg-sky-50 mx-auto flex items-center justify-center mb-3 shadow-inner">
