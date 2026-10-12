@@ -1,5 +1,3 @@
----
-
 # Pix Glance (Mobile)
 
 ## Team Anonymous
@@ -8,8 +6,6 @@
 
 * Archit Mishra
 * Jyoti Sahu
-
----
 
 ## 🎯 The Problem
 
@@ -30,12 +26,13 @@ To solve this, we built **Pix Glance**, a versatile and powerful mobile applicat
 
 Here is a glimpse of the Pix Glance app in action:
 
-![Opening Screen](screenshots/Opening_Screen.png)
-![Home Screen](screenshots/Home_Screen.png)
-![SVG Example](screenshots/SVG_IMG_Example.png)
-![Cache Example](screenshots/Cache_example.png)
-![Conversion Example](screenshots/Conversion_example.png)
-
+<div align="center">
+  <img src="screenshots/Opening_Screen.png" width="200" alt="Opening Screen" />
+  <img src="screenshots/Home_Screen.png" width="200" alt="Home Screen" />
+  <img src="screenshots/SVG_IMG_Example.png" width="200" alt="SVG Example" />
+  <img src="screenshots/Cache_example.png" width="200" alt="Cache Example" />
+  <img src="screenshots/Conversion_example.png" width="200" alt="Conversion Example" />
+</div>
 ---
 
 ## 🖼 Supported Image Formats
