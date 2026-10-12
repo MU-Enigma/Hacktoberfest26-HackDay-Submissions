@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillBarter AI - Mahindra University</title>
+  <!-- Chart.js for Campus Skill Deficit Heatmap -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root {
+      --bg: #070c18;
+      --panel: #0d1629;
+      --card: #13203c;
+      --card-inner: #0a1122;
+      --border: #1e3158;
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --accent: #10b981;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --cyan: #06b6d4;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+
+    /* Login Modal */
+    .auth-overlay { position: fixed; inset: 0; background: rgba(5, 8, 16, 0.94); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+    .auth-box { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; width: 440px; padding: 28px; box-shadow: 0 20px 50px rgba(0,0,0,0.7); }
+    .auth-badge { background: linear-gradient(135deg, #4f46e5, #06b6d4); color: white; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px; display: inline-block; margin-bottom: 8px; }
+
+    /* Header */
+    header { height: 60px; background: #050a14; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; position: sticky; top: 0; z-index: 100; }
+    .brand { font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .brand span { color: var(--cyan); }
+    .user-pill { display: flex; align-items: center; gap: 12px; background: var(--panel); border: 1px solid var(--border); padding: 5px 14px; border-radius: 24px; }
+    .credits-tag { background: rgba(245, 158, 11, 0.15); border: 1px solid var(--warn); color: var(--warn); font-weight: 800; font-size: 11px; padding: 3px 9px; border-radius: 12px; }
+
+    /* Layout Workspace */
+    .workspace { display: grid; grid-template-columns: 380px 1fr; flex: 1; min-height: calc(100vh - 60px); }
+    .sidebar { background: var(--panel); border-right: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 18px; overflow-y: auto; }
+    .content { padding: 24px; display: flex; flex-direction: column; gap: 24px; overflow-y: auto; }
+
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+    .card h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+
+    input, select { width: 100%; background: var(--card-inner); border: 1px solid var(--border); color: #fff; padding: 9px 12px; border-radius: 6px; font-size: 12px; margin-bottom: 10px; outline: none; transition: border-color 0.2s; }
+    input:focus, select:focus { border-color: var(--primary); }
+
+    .btn { background: var(--primary); color: white; border: none; padding: 9px 14px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s; }
+    .btn:hover { background: var(--primary-hover); transform: translateY(-1px); }
+    .btn-success { background: var(--accent); }
+    .btn-success:hover { background: #059669; }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+    .btn-outline:hover { color: #fff; border-color: var(--danger); }
+
+    /* Course Cards Grid */
+    .courses-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 16px; }
+    .course-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.2s; }
+    .course-card:hover { border-color: #3b5282; transform: translateY(-2px); }
+
+    .chip-offer { display: inline-block; background: rgba(16, 185, 129, 0.15); color: var(--accent); border: 1px solid rgba(16, 185, 129, 0.3); font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; margin: 3px 3px 3px 0; }
+    .chip-want { display: inline-block; background: rgba(6, 182, 212, 0.15); color: var(--cyan); border: 1px solid rgba(6, 182, 212, 0.3); font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; margin: 3px 3px 3px 0; }
+
+    .session-card { background: var(--card-inner); border-left: 3px solid var(--warn); padding: 12px; border-radius: 6px; margin-bottom: 10px; }
+    .otp-badge { font-family: monospace; font-size: 16px; font-weight: 800; color: var(--warn); letter-spacing: 2px; }
+
+    /* Live Email Feedback Toast */
+    .email-toast { position: fixed; bottom: 20px; right: 20px; background: #111e38; border: 1px solid #2563eb; color: #fff; padding: 14px 18px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); display: none; z-index: 10000; max-width: 380px; }
+  </style>
+</head>
+<body>
+
+  <!-- Login Modal -->
+  <div class="auth-overlay" id="authModal">
+    <div class="auth-box">
+      <div class="auth-badge">MAHINDRA UNIVERSITY ACCESS</div>
+      <h2 style="font-size: 20px; margin-bottom: 6px;">Sign In to Skill Barter</h2>
+      <p style="font-size: 12px; color: var(--muted); margin-bottom: 18px;">
+        Use your <code>@mahindrauniversity.edu.in</code> email. All students receive <strong>2 welcome credits</strong> automatically.
+      </p>
+
+      <label style="font-size: 10px; color: var(--muted); text-transform: uppercase;">Full Name</label>
+      <input type="text" id="loginName" placeholder="e.g. Dheeraj Reddy">
+
+      <label style="font-size: 10px; color: var(--muted); text-transform: uppercase;">University Email</label>
+      <input type="email" id="loginEmail" placeholder="your_id@mahindrauniversity.edu.in">
+
+      <div id="loginError" style="color: var(--danger); font-size: 11px; margin-bottom: 12px; display: none;"></div>
+      <button class="btn" style="width: 100%; padding: 11px;" onclick="handleLogin()">
+        <i data-lucide="log-in" style="width: 14px;"></i> Enter Campus Board
+      </button>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="brand">
+      <i data-lucide="repeat" style="color: var(--cyan); width: 18px;"></i>
+      <span>SkillBarter</span> MU
+    </div>
+    <div style="display: flex; align-items: center; gap: 14px;">
+      <div class="user-pill">
+        <span style="font-size: 11px; color: var(--muted);" id="headerUserEmail">checking session...</span>
+        <span class="credits-tag" id="headerCredits">-- Credits</span>
+      </div>
+      <button class="btn btn-outline" onclick="logout()">
+        <i data-lucide="log-out" style="width: 12px;"></i> Logout
+      </button>
+    </div>
+  </header>
+
+  <!-- Workspace -->
+  <div class="workspace">
+    
+    <!-- Sidebar: Profile, Skills Offered & Active Escrow -->
+    <aside class="sidebar">
+      <!-- Profile Card -->
+      <div class="card">
+        <h3><i data-lucide="user" style="width: 13px;"></i> Student Dossier</h3>
+        <div style="font-weight: 700; font-size: 14px;" id="profName">Student Name</div>
+        <div style="font-size: 11px; color: var(--muted);" id="profEmail">user@mahindrauniversity.edu.in</div>
+
+        <div style="margin-top: 14px;">
+          <div style="font-size: 10px; color: var(--muted); margin-bottom: 4px;">COURSES YOU OFFER (EARN CREDITS):</div>
+          <div id="profOfferedChips"><span style="font-size: 11px; color: var(--muted);">None added yet.</span></div>
+        </div>
+
+        <div style="margin-top: 12px;">
+          <div style="font-size: 10px; color: var(--muted); margin-bottom: 4px;">SKILLS YOU WANT (DEMAND):</div>
+          <div id="profWantedChips"><span style="font-size: 11px; color: var(--muted);">None added yet.</span></div>
+        </div>
+      </div>
+
+      <!-- Add Course / Add Demand -->
+      <div class="card">
+        <h3><i data-lucide="plus-circle" style="width: 13px;"></i> Offer or Request a Course</h3>
+        <select id="courseType" onchange="toggleCreditFeeInput()">
+          <option value="offer">I Can Teach (Offer Course)</option>
+          <option value="want">I Want to Learn (Post Demand)</option>
+        </select>
+        <input type="text" id="courseNameInput" placeholder="e.g. C Pointers, DSA Graphs, Figma">
+        
+        <div id="creditFeeGroup">
+          <label style="font-size: 10px; color: var(--muted);">Course Credit Fee (Credits to Earn):</label>
+          <select id="courseCreditsInput">
+            <option value="1">1 Credit (1-hr doubt/overview)</option>
+            <option value="2">2 Credits (2-hr deep dive/lab support)</option>
+            <option value="3">3 Credits (Comprehensive project support)</option>
+          </select>
+        </div>
+
+        <button class="btn" style="width: 100%;" onclick="addCourse()">
+          <i data-lucide="save" style="width: 13px;"></i> Publish to Campus
+        </button>
+      </div>
+
+      <!-- Active Sessions & Escrow OTP -->
+      <div class="card" style="flex: 1;">
+        <h3><i data-lucide="shield-check" style="width: 13px;"></i> My Sessions & Escrow Status</h3>
+        <div id="sessionList">
+          <span style="font-size: 11px; color: var(--muted);">No active sessions.</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="content">
+      
+      <!-- Top Campus Charts: Demand vs Supply -->
+      <div class="card">
+        <h3><i data-lucide="bar-chart-2" style="width: 13px;"></i> Campus Skill Deficit Heatmap (Courses in Demand vs. Mentors Offering)</h3>
+        <p style="font-size: 11px; color: var(--muted); margin-bottom: 12px;">
+          Students who offer courses in high-deficit areas (red bars) earn credits faster due to queue demand.
+        </p>
+        <div style="height: 200px; position: relative;">
+          <canvas id="analyticsChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Course Marketplace -->
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px;">
+          <div>
+            <h2 style="font-size: 16px; font-weight: 800;">Available Courses from Campus Mentors</h2>
+            <p style="font-size: 12px; color: var(--muted);">
+              Booking a course locks credits into escrow and triggers a live email notification directly to the mentor.
+            </p>
+          </div>
+          <button class="btn btn-outline" onclick="loadCatalog()" style="font-size: 10px; padding: 6px 10px;">
+            <i data-lucide="refresh-cw" style="width: 11px;"></i> Refresh
+          </button>
+        </div>
+
+        <div class="courses-grid" id="catalogContainer">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Real-time Email Toast Notification -->
+  <div class="email-toast" id="emailToast">
+    <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 12px; color: #38bdf8; margin-bottom: 4px;">
+      <i data-lucide="mail-check" style="width: 14px;"></i> Live Email Dispatch Alert
+    </div>
+    <div style="font-size: 11px; color: #cbd5e1;" id="toastMessage">Email dispatched!</div>
+  </div>
+
+  <script>
+    let currentUser = null;
+    let chartInstance = null;
+
+    function toggleCreditFeeInput() {
+      const type = document.getElementById('courseType').value;
+      document.getElementById('creditFeeGroup').style.display = type === 'offer' ? 'block' : 'none';
+    }
+
+    async function handleLogin() {
+      const name = document.getElementById('loginName').value.trim();
+      const email = document.getElementById('loginEmail').value.trim();
+      const errBox = document.getElementById('loginError');
+      errBox.style.display = 'none';
+
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email })
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          errBox.textContent = data.error;
+          errBox.style.display = 'block';
+          return;
+        }
+
+        currentUser = data.user;
+        localStorage.setItem('mu_sb_user', JSON.stringify(currentUser));
+        document.getElementById('authModal').style.display = 'none';
+        renderDashboard();
+      } catch (err) {
+        errBox.textContent = "Cannot connect to server. Ensure 'python app.py' is running in VS Code terminal.";
+        errBox.style.display = 'block';
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('mu_sb_user');
+      location.reload();
+    }
+
+    async function renderDashboard() {
+      document.getElementById('headerUserEmail').textContent = currentUser.email;
+      document.getElementById('headerCredits').textContent = `${currentUser.credits} Credit${currentUser.credits === 1 ? '' : 's'}`;
+      document.getElementById('profName').textContent = currentUser.name;
+      document.getElementById('profEmail').textContent = currentUser.email;
+
+      // Render Offered Chips
+      const offeredContainer = document.getElementById('profOfferedChips');
+      if (currentUser.courses_offered.length === 0) {
+        offeredContainer.innerHTML = '<span style="font-size:11px; color:var(--muted);">None added yet.</span>';
+      } else {
+        offeredContainer.innerHTML = currentUser.courses_offered.map(c => 
+          `<span class="chip-offer">${c.name} (${c.credits} Cr)</span>`
+        ).join('');
+      }
+
+      // Render Wanted Chips
+      const wantedContainer = document.getElementById('profWantedChips');
+      if (currentUser.wanted_skills.length === 0) {
+        wantedContainer.innerHTML = '<span style="font-size:11px; color:var(--muted);">None added yet.</span>';
+      } else {
+        wantedContainer.innerHTML = currentUser.wanted_skills.map(w => 
+          `<span class="chip-want">${w}</span>`
+        ).join('');
+      }
+
+      lucide.createIcons();
+      loadCatalog();
+      loadSessions();
+      loadAnalytics();
+    }
+
+    async function addCourse() {
+      const type = document.getElementById('courseType').value;
+      const name = document.getElementById('courseNameInput').value.trim();
+      const credits = document.getElementById('courseCreditsInput').value;
+
+      if (!name) return;
+
+      const res = await fetch('/api/courses/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: currentUser.email, type, name, credits })
+      });
+      const data = await res.json();
+      currentUser = data.user;
+      document.getElementById('courseNameInput').value = '';
+      renderDashboard();
+    }
+
+    async function loadCatalog() {
+      const res = await fetch(`/api/courses/available?email=${encodeURIComponent(currentUser.email)}`);
+      const data = await res.json();
+      const container = document.getElementById('catalogContainer');
+      container.innerHTML = '';
+
+      if (data.catalog.length === 0) {
+        container.innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--muted); font-size: 12px;">
+            No other students have listed courses yet. Open an incognito tab, sign in with another @mahindrauniversity.edu.in ID, and offer a skill!
+          </div>
+        `;
+        return;
+      }
+
+      data.catalog.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'course-card';
+        card.innerHTML = `
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <strong style="font-size: 14px; color: #fff;">${item.course_name}</strong>
+              <span style="font-size: 11px; color: var(--warn); font-weight: 800; background: rgba(245, 158, 11, 0.15); padding: 2px 7px; border-radius: 4px; border: 1px solid var(--warn);">
+                ${item.course_credits} Credit(s)
+              </span>
+            </div>
+            <div style="font-size: 11px; color: var(--muted); margin-top: 6px;">
+              Mentor: <strong style="color: #cbd5e1;">${item.mentor_name}</strong>
+            </div>
+            <div style="font-size: 10px; color: var(--muted);">${item.mentor_email}</div>
+          </div>
+
+          <button class="btn btn-success" style="margin-top: 14px; width: 100%;" onclick="bookCourse('${item.mentor_email}', '${item.course_name}', ${item.course_credits})">
+            <i data-lucide="mail" style="width: 12px;"></i> Book & Dispatch Email
+          </button>
+        `;
+        container.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    async function bookCourse(mentorEmail, courseName, courseCredits) {
+      if (currentUser.credits < courseCredits) {
+        alert(`Insufficient Credits!\nYou currently have ${currentUser.credits} credits, but this course requires ${courseCredits} credit(s). Offer a course first to earn credits!`);
+        return;
+      }
+
+      const slot = prompt(`Enter preferred campus meeting venue & time for [${courseName}]:`, "Central Library 2nd Floor, Tomorrow 4:00 PM");
+      if (!slot) return;
+
+      const res = await fetch('/api/sessions/book', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          learner_email: currentUser.email,
+          mentor_email: mentorEmail,
+          course_name: courseName,
+          course_credits: courseCredits,
+          slot: slot
+        })
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        currentUser.credits = data.remaining_credits;
+        document.getElementById('headerCredits').textContent = `${currentUser.credits} Credits`;
+
+        // Trigger on-screen feedback toast
+        const toast = document.getElementById('emailToast');
+        const toastMsg = document.getElementById('toastMessage');
+        if (data.email_sent) {
+          toastMsg.innerHTML = `✅ Email with OTP successfully dispatched to <strong>${mentorEmail}</strong>!`;
+        } else {
+          toastMsg.innerHTML = `⚠️ Session booked and credits held in escrow! (SMTP Notice: ${data.email_status})`;
+        }
+        toast.style.display = 'block';
+        setTimeout(() => toast.style.display = 'none', 6000);
+
+        loadSessions();
+      } else {
+        alert(data.error);
+      }
+    }
+
+    async function loadSessions() {
+      const res = await fetch(`/api/sessions/list?email=${encodeURIComponent(currentUser.email)}`);
+      const data = await res.json();
+      const list = document.getElementById('sessionList');
+      list.innerHTML = '';
+
+      if (data.sessions.length === 0) {
+        list.innerHTML = '<span style="font-size: 11px; color: var(--muted);">No active sessions or escrow holds.</span>';
+        return;
+      }
+
+      data.sessions.forEach(s => {
+        const isMentor = s.mentor_email === currentUser.email;
+        const div = document.createElement('div');
+        div.className = 'session-card';
+        div.innerHTML = `
+          <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); margin-bottom: 4px;">
+            <span>${isMentor ? '🎓 You are Mentoring' : '📖 You are Learning'}</span>
+            <span style="color: ${s.status === 'completed' ? 'var(--accent)' : 'var(--warn)'}; font-weight: 700;">
+              ${s.status.toUpperCase()} (${s.course_credits} Cr)
+            </span>
+          </div>
+          <strong style="font-size: 12px; color: #fff;">${s.course_name}</strong>
+          <div style="font-size: 10px; color: var(--muted); margin: 2px 0;">Slot: ${s.slot}</div>
+
+          ${s.status === 'scheduled' ? `
+            <div style="margin-top: 8px;">
+              ${isMentor ? `
+                <div style="background: rgba(245, 158, 11, 0.1); border: 1px dashed var(--warn); padding: 6px; border-radius: 4px;">
+                  <span style="font-size: 9px; color: var(--muted); display: block;">YOUR COMPLETION CODE (ALSO IN EMAIL):</span>
+                  <span class="otp-badge">${s.otp}</span>
+                </div>
+              ` : `
+                <button class="btn btn-success" style="padding: 4px 8px; font-size: 10px;" onclick="verifyOtp('${s.id}')">
+                  <i data-lucide="key" style="width: 10px;"></i> Enter Mentor's OTP
+                </button>
+              `}
+            </div>
+          ` : `
+            <div style="font-size: 10px; color: var(--accent); margin-top: 6px; font-weight: 600;">
+              ✓ ${s.course_credits} Credit(s) Transferred
+            </div>
+          `}
+        `;
+        list.appendChild(div);
+      });
+      lucide.createIcons();
+    }
+
+    async function verifyOtp(sessionId) {
+      const otp = prompt("Enter the 4-digit OTP code sent to your mentor's email:");
+      if (!otp) return;
+
+      const res = await fetch('/api/sessions/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: sessionId, otp: otp })
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        alert(data.message);
+        loadSessions();
+      } else {
+        alert(data.error);
+      }
+    }
+
+    async function loadAnalytics() {
+      const res = await fetch('/api/analytics');
+      const data = await res.json();
+
+      const ctx = document.getElementById('analyticsChart').getContext('2d');
+      if (chartInstance) chartInstance.destroy();
+
+      chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: data.labels,
+          datasets: [
+            {
+              label: 'Students Wanting (Demand)',
+              data: data.demand,
+              backgroundColor: '#ef4444',
+              borderRadius: 4
+            },
+            {
+              label: 'Mentors Offering (Supply)',
+              data: data.supply,
+              backgroundColor: '#10b981',
+              borderRadius: 4
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: '#94a3b8', font: { size: 10 } } }
+          },
+          scales: {
+            x: { ticks: { color: '#94a3b8', font: { size: 10 } } },
+            y: { ticks: { color: '#94a3b8', stepSize: 1, font: { size: 10 } }, beginAtZero: true }
+          }
+        }
+      });
+    }
+
+    window.onload = () => {
+      lucide.createIcons();
+      const saved = localStorage.getItem('mu_sb_user');
+      if (saved) {
+        currentUser = JSON.parse(saved);
+        document.getElementById('authModal').style.display = 'none';
+        renderDashboard();
+      }
+    };
+  </script>
+</body>
+</html>
