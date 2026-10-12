@@ -35,7 +35,6 @@ def init_db():
                 status TEXT DEFAULT 'Waiting'
             )
         ''')
-        # Initialize exactly 3 floors if table is empty
         if not conn.execute("SELECT COUNT(*) FROM machines").fetchone()[0]:
             floors = ["First Floor", "Fifth Floor", "Seventh Floor"]
             for floor in floors:
@@ -46,7 +45,7 @@ def refresh_system_states(conn):
     now = datetime.now()
     now_str = now.isoformat()
     
-    # 1. Reservation Expired (Reserved -> Drop User from Queue and make Available)
+    # 1. Reservation Expired Logic
     expired = conn.execute(
         "SELECT id, reserved_for_name, reserved_for_phone FROM machines WHERE status = 'Reserved' AND reservation_expiry < ?",
         (now_str,)
@@ -59,7 +58,7 @@ def refresh_system_states(conn):
         )
         conn.execute("DELETE FROM queue WHERE name = ? AND phone = ? AND status = 'Notified'", (row['reserved_for_name'], row['reserved_for_phone']))
 
-    # 2. Queue Assignment Logic (If a machine is Available and nobody is reserved, assign the next waiter)
+    # 2. Queue Assignment Logic
     available_machines = conn.execute("SELECT id FROM machines WHERE status = 'Available'").fetchall()
     for mach in available_machines:
         current_mach = conn.execute("SELECT reserved_for_name FROM machines WHERE id = ?", (mach['id'],)).fetchone()
@@ -171,6 +170,7 @@ DASHBOARD_TEMPLATE = """
     <title>Washing MUchine Hub</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="refresh" content="30">
+    <link rel="icon" href="https://fav.farm/🧺">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @keyframes floatBubble {
@@ -189,13 +189,11 @@ DASHBOARD_TEMPLATE = """
     </style>
 </head>
 <body class="bg-gradient-to-br from-sky-100 via-cyan-50 to-blue-100 text-slate-800 min-h-screen p-4 sm:p-8 relative overflow-x-hidden">
-    <!-- Decorative Floating Bubbles -->
     <div class="bubble w-6 h-6 top-10 left-10" style="animation-delay: 0s;"></div>
     <div class="bubble w-10 h-10 top-40 right-12" style="animation-delay: 1.5s;"></div>
     <div class="bubble w-4 h-4 bottom-20 left-1/4" style="animation-delay: 2.2s;"></div>
 
     <div class="max-w-3xl mx-auto relative z-10">
-        <!-- Header -->
         <header class="text-center mb-8">
             <span class="bg-sky-200/80 text-sky-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-sm">
                 🧼 Mahindra University Hostel
@@ -206,7 +204,6 @@ DASHBOARD_TEMPLATE = """
             <p class="text-sm text-sky-700 font-medium mt-1">Real-time Laundry Hub • Auto-refreshes every 30s</p>
         </header>
 
-        <!-- Machine Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
             {% for m in machines %}
             <div class="bg-white/90 backdrop-blur rounded-3xl p-5 shadow-lg border-2 
@@ -215,12 +212,9 @@ DASHBOARD_TEMPLATE = """
                 {% elif m.status == 'Idle' %} border-rose-300 
                 {% else %} border-amber-300 {% endif %} relative flex flex-col justify-between">
                 
-                <!-- Card Header with Washing Machine Porthole -->
                 <div>
                     <div class="flex items-center justify-between mb-3">
                         <h3 class="font-extrabold text-lg text-slate-900 tracking-tight">{{m.name}}</h3>
-                        
-                        <!-- Animated Porthole Icon -->
                         <div class="w-10 h-10 rounded-full border-4 border-slate-200 bg-sky-50 flex items-center justify-center relative shadow-inner overflow-hidden">
                             {% if m.status == 'In-Use' %}
                                 <div class="absolute inset-0 bg-sky-300/40 animate-pulse"></div>
@@ -233,7 +227,6 @@ DASHBOARD_TEMPLATE = """
                         </div>
                     </div>
 
-                    <!-- Status Pill -->
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider
                         {% if m.status == 'Available' %} bg-emerald-100 text-emerald-700 
                         {% elif m.status == 'In-Use' %} bg-sky-100 text-sky-700 
@@ -243,7 +236,6 @@ DASHBOARD_TEMPLATE = """
                     </span>
                 </div>
 
-                <!-- Card Details -->
                 <div class="mt-5 pt-4 border-t border-sky-100 text-sm">
                     {% if m.status == 'In-Use' %}
                         <p class="text-slate-700 font-semibold">User: <strong class="text-slate-900">{{m.current_user_name}}</strong></p>
@@ -263,7 +255,6 @@ DASHBOARD_TEMPLATE = """
             {% endfor %}
         </div>
 
-        <!-- Virtual Queue Section -->
         <section class="bg-white/90 backdrop-blur rounded-3xl p-6 shadow-lg border border-sky-100 mb-8">
             <h2 class="text-xl font-extrabold text-slate-900 mb-4 flex items-center gap-2">
                 ⏳ Virtual Queue <span class="text-xs font-normal text-sky-600 bg-sky-100 px-2.5 py-0.5 rounded-full font-bold">Soaking...</span>
@@ -288,7 +279,6 @@ DASHBOARD_TEMPLATE = """
             </ul>
         </section>
 
-        <!-- Hackathon Links -->
         <section class="bg-sky-900 text-white rounded-3xl p-6 text-center shadow-xl">
             <h3 class="text-xs font-bold text-sky-300 uppercase tracking-widest mb-3">📱 Hackathon QR Code Simulators</h3>
             <div class="flex flex-wrap justify-center gap-3">
@@ -311,12 +301,12 @@ MACHINE_TEMPLATE = """
     <meta charset="UTF-8">
     <title>{{machine.name}} Portal</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://fav.farm/🧺">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gradient-to-br from-sky-100 via-cyan-50 to-blue-100 text-slate-800 min-h-screen flex items-center justify-center p-4">
     <div class="bg-white/95 backdrop-blur w-full max-w-md rounded-3xl shadow-xl border border-sky-100 p-6 text-center relative overflow-hidden">
         
-        <!-- Header -->
         <div class="w-16 h-16 rounded-full border-4 border-sky-200 bg-sky-50 mx-auto flex items-center justify-center mb-3 shadow-inner">
             {% if machine.status == 'In-Use' %}
                 <svg class="w-9 h-9 text-sky-600 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -343,7 +333,6 @@ MACHINE_TEMPLATE = """
             </div>
         {% endif %}
 
-        <!-- Form Box -->
         <div class="bg-sky-50/50 border border-sky-100 p-4 rounded-2xl text-left">
             <form method="POST" class="space-y-3">
                 <div>
@@ -387,6 +376,7 @@ MACHINE_TEMPLATE = """
 </body>
 </html>
 """
+
 if __name__ == '__main__':
     init_db()
     port = int(os.environ.get("PORT", 5000))
