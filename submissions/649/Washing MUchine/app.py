@@ -339,7 +339,7 @@ DASHBOARD_TEMPLATE = """
                         <p class="text-xs text-rose-600 mt-0.5 font-extrabold animate-pulse">⏰ Expires in 5 mins!</p>
                     {% else %}
                         <p class="text-xs text-slate-400 italic">Drum is empty & ready for load</p>
-                    <% endif %}
+                    {% endif %}
                 </div>
             </div>
             {% endfor %}
