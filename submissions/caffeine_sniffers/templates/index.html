@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SideQuest · Mahindra University</title>
+  <meta name="description" content="Campus social discovery through shared activities. Don't just find people. Find your next little adventure." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+  <a class="skip-link" href="#main">skip to content</a>
+
+  <div id="app">
+    <!-- Landing -->
+    <section id="view-landing" class="view view-landing" aria-label="Welcome">
+      <div class="landing-bg" aria-hidden="true">
+        <span class="float doodle star">✦</span>
+        <span class="float doodle flower">✿</span>
+        <span class="float doodle heart">♡</span>
+        <span class="float doodle spark">✧</span>
+        <span class="tape tape-1"></span>
+        <span class="tape tape-2"></span>
+      </div>
+
+      <header class="landing-top">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">★</span>
+          <span class="brand-name">SideQuest</span>
+        </div>
+        <p class="brand-note">Mahindra University prototype · fictional campus profiles</p>
+      </header>
+
+      <div class="landing-hero">
+        <div class="hero-copy">
+          <div class="mascot-row">
+            <svg class="mascot" viewBox="0 0 64 64" width="56" height="56" aria-hidden="true">
+              <circle cx="32" cy="32" r="28" fill="#FFE38A" stroke="#453A55" stroke-width="3"/>
+              <circle cx="22" cy="28" r="4" fill="#393149"/>
+              <circle cx="42" cy="28" r="4" fill="#393149"/>
+              <path d="M22 40 Q32 48 42 40" fill="none" stroke="#393149" stroke-width="3" stroke-linecap="round"/>
+              <circle cx="50" cy="14" r="6" fill="#FFB7CE" stroke="#453A55" stroke-width="2"/>
+            </svg>
+            <div class="speech-inline" role="status">
+              pssst... the campus is full of people you haven't met yet 👀
+            </div>
+          </div>
+          <h1>don't just find people. find your next little adventure.</h1>
+          <p class="lede">discover activities, meet new friends, and explore shared vibes through real experiences.</p>
+          <div class="cta-row">
+            <button type="button" class="btn btn-primary" data-nav="auth">let's find a quest ✿</button>
+            <button type="button" class="btn btn-mint" id="btn-demo-login">try demo account</button>
+            <button type="button" class="btn btn-ghost" id="btn-what-is">what is this place?</button>
+          </div>
+        </div>
+
+        <div class="hero-scrapbook" aria-hidden="true">
+          <article class="preview-card rotate-left pastel-pink">
+            <span class="sticker">🎲</span>
+            <h3>board game night</h3>
+            <p>snacks emotionally mandatory</p>
+          </article>
+          <article class="preview-card rotate-right pastel-mint">
+            <span class="sticker">📷</span>
+            <h3>photo walk</h3>
+            <p>indie film energy</p>
+          </article>
+          <article class="preview-card rotate-tilt pastel-sky">
+            <span class="sticker">☕</span>
+            <h3>coffee chat</h3>
+            <p>overthink nothing</p>
+          </article>
+        </div>
+      </div>
+
+      <!-- Demo Characters Drawer -->
+      <section class="paper-card" style="margin-top: 2rem;">
+        <h3 style="font-size: 1.15rem; margin-bottom: 0.35rem;">✦ hop in as any seeded demo student:</h3>
+        <p class="helper" style="margin-bottom: 0.8rem;">Click any fictional Mahindra University student to explore their perspective, study year, and tailored recommendations:</p>
+        <div class="demo-users-grid">
+          <button type="button" class="demo-user-card" data-demo-email="se25ucse100@{{ university_domain }}">
+            <span class="avatar" style="width:2.2rem;height:2.2rem">✿</span>
+            <div class="info">
+              <strong>Aanya Kapoor</strong>
+              <span>SE25 · Second Year · CSE</span>
+            </div>
+          </button>
+          <button type="button" class="demo-user-card" data-demo-email="se24ucse002@{{ university_domain }}">
+            <span class="avatar" style="width:2.2rem;height:2.2rem">✧</span>
+            <div class="info">
+              <strong>Rohan Mehta</strong>
+              <span>SE24 · Third Year · CSE</span>
+            </div>
+          </button>
+          <button type="button" class="demo-user-card" data-demo-email="se26uecm024@{{ university_domain }}">
+            <span class="avatar" style="width:2.2rem;height:2.2rem">✦</span>
+            <div class="info">
+              <strong>Sara Iqbal</strong>
+              <span>SE26 · First Year · ECM</span>
+            </div>
+          </button>
+          <button type="button" class="demo-user-card" data-demo-email="se25uaid004@{{ university_domain }}">
+            <span class="avatar" style="width:2.2rem;height:2.2rem">🫧</span>
+            <div class="info">
+              <strong>Dev Patel</strong>
+              <span>SE25 · Second Year · AI & DS</span>
+            </div>
+          </button>
+          <button type="button" class="demo-user-card" data-demo-email="se23ucse005@{{ university_domain }}">
+            <span class="avatar" style="width:2.2rem;height:2.2rem">✿</span>
+            <div class="info">
+              <strong>Maya Sharma</strong>
+              <span>SE23 · Fourth Year · CSE</span>
+            </div>
+          </button>
+          <button type="button" class="demo-user-card" data-demo-email="se24umech006@{{ university_domain }}">
+            <span class="avatar" style="width:2.2rem;height:2.2rem">✧</span>
+            <div class="info">
+              <strong>Kabir Nair</strong>
+              <span>SE24 · Third Year · Mechanical</span>
+            </div>
+          </button>
+          <button type="button" class="demo-user-card" data-demo-email="se26ucse007@{{ university_domain }}">
+            <span class="avatar" style="width:2.2rem;height:2.2rem">★</span>
+            <div class="info">
+              <strong>Priya Sen</strong>
+              <span>SE26 · First Year · CSE</span>
+            </div>
+          </button>
+        </div>
+      </section>
+
+      <section class="landing-explain" id="what-is">
+        <h2>don't just find people. find your next thing to do.</h2>
+        <p>
+          SideQuest is a campus-exclusive social discovery app for Mahindra University students.
+          Activities come first — friendship, dating, or open-to-meeting intentions are labels, never assumptions.
+        </p>
+        <ul class="pill-list">
+          <li>Friendship quests</li>
+          <li>Dating intentions</li>
+          <li>Either / open vibes</li>
+          <li>Inclusive guest lists</li>
+          <li>Zero AI black-boxes</li>
+        </ul>
+      </section>
+    </section>
+
+    <!-- App shell -->
+    <div id="app-shell" class="app-shell hidden">
+      <header class="top-nav" aria-label="Main">
+        <button type="button" class="brand brand-btn" data-nav="discover" aria-label="SideQuest home">
+          <span class="brand-mark" aria-hidden="true">★</span>
+          <span class="brand-name">SideQuest</span>
+        </button>
+        <nav class="nav-links desktop-nav" aria-label="Sections">
+          <button type="button" class="nav-item" data-nav="discover">Discover</button>
+          <button type="button" class="nav-item" data-nav="my-quests">My quests</button>
+          <button type="button" class="nav-item" data-nav="create">Create quest</button>
+          <button type="button" class="nav-item" data-nav="profile">Profile</button>
+        </nav>
+        <div class="nav-user-section" id="nav-user-area">
+          <!-- Filled dynamically by JS -->
+        </div>
+      </header>
+
+      <main id="main" class="main">
+        <!-- Auth View -->
+        <section id="view-auth" class="view view-auth hidden" aria-label="Authentication">
+          <div class="dialogue-panel" style="margin-bottom:1.5rem">
+            <div aria-hidden="true" style="font-size:1.6rem">🌸</div>
+            <div class="bubble">
+              <p>who goes there? identify yourself, student traveler ✿</p>
+            </div>
+          </div>
+
+          <div class="auth-tabs" role="tablist">
+            <button type="button" class="auth-tab-btn active" id="tab-btn-login">Log In</button>
+            <button type="button" class="auth-tab-btn" id="tab-btn-register">Register</button>
+          </div>
+
+          <!-- Login Form -->
+          <div id="auth-login-pane" class="paper-card auth-card">
+            <form id="login-form" novalidate>
+              <div class="field">
+                <label for="l-email">university email</label>
+                <input id="l-email" name="email" type="email" placeholder="se25ucse100@{{ university_domain }}" required />
+                <p class="field-error" data-auth-error="email" hidden></p>
+              </div>
+              <div class="field">
+                <div style="display:flex; justify-content:space-between; align-items:center">
+                  <label for="l-password" style="margin-bottom:0">password</label>
+                  <a href="/login" style="font-size:0.8rem; color:var(--muted-ink); text-decoration:underline">forgot password?</a>
+                </div>
+                <input id="l-password" name="password" type="password" placeholder="••••••••" required style="margin-top:0.3rem" />
+                <p class="field-error" data-auth-error="password" hidden></p>
+              </div>
+              <p class="field-error" id="login-general-error" hidden></p>
+              <div class="form-actions" style="margin-top:1rem">
+                <button type="submit" class="btn btn-primary" style="width:100%">log in to questing ✦</button>
+              </div>
+            </form>
+
+            <div style="margin-top:1.5rem; border-top:2px dashed var(--border); padding-top:1rem;">
+              <p style="font-size:0.85rem; font-weight:700; color:var(--muted-ink)">or hop in instantly as a demo explorer:</p>
+              <div style="display:flex; flex-wrap:wrap; gap:0.4rem; margin-top:0.5rem">
+                <button type="button" class="btn btn-ghost" data-demo-email="se25ucse100@{{ university_domain }}" style="font-size:0.8rem">Aanya (2nd yr)</button>
+                <button type="button" class="btn btn-ghost" data-demo-email="se24ucse002@{{ university_domain }}" style="font-size:0.8rem">Rohan (3rd yr)</button>
+                <button type="button" class="btn btn-ghost" data-demo-email="se26uecm024@{{ university_domain }}" style="font-size:0.8rem">Sara (1st yr)</button>
+                <button type="button" class="btn btn-ghost" data-demo-email="se23ucse005@{{ university_domain }}" style="font-size:0.8rem">Maya (4th yr)</button>
+              </div>
+              <p style="margin-top:0.75rem; font-size:0.85rem; text-align:center"><a href="/login" style="color:var(--ink); font-weight:700">Open full standalone login & register portal →</a></p>
+            </div>
+          </div>
+
+          <!-- Register Form -->
+          <div id="auth-register-pane" class="paper-card auth-card hidden">
+            <div class="safety-notice" style="margin-top:0; margin-bottom:1rem">
+              <p>ⓘ Note: Real email verification is in demo mode. You can register and immediately log in!</p>
+            </div>
+            <form id="register-form" novalidate>
+              <div class="field">
+                <label for="r-email">university email</label>
+                <input id="r-email" name="email" type="email" placeholder="se26uecm024@{{ university_domain }}" required />
+                <p class="helper">Use your @{{ university_domain }} email with cohort & branch code (e.g. se26uecm024@{{ university_domain }}).</p>
+                <p class="field-error" data-reg-error="email" hidden></p>
+              </div>
+              <div class="field">
+                <label for="r-display-name">display name</label>
+                <input id="r-display-name" name="display_name" maxlength="40" placeholder="e.g. Tara Rao" required />
+                <p class="field-error" data-reg-error="display_name" hidden></p>
+              </div>
+              <div class="field">
+                <label for="r-password">password</label>
+                <input id="r-password" name="password" type="password" minlength="6" placeholder="at least 6 characters" required />
+                <p class="field-error" data-reg-error="password" hidden></p>
+              </div>
+              <div class="field-row" style="grid-template-columns:1fr 1fr">
+                <div class="field">
+                  <label for="r-gender">gender <span class="optional">(optional)</span></label>
+                  <select id="r-gender" name="gender">
+                    <option value="prefer_not_to_say">Prefer not to say</option>
+                    <option value="woman">Woman</option>
+                    <option value="man">Man</option>
+                    <option value="non_binary">Non-binary</option>
+                    <option value="self_describe">Self-describe...</option>
+                  </select>
+                  <p class="field-error" data-reg-error="gender" hidden></p>
+                </div>
+                <div class="field">
+                  <label for="r-pref">connection vibe</label>
+                  <select id="r-pref" name="connection_preference">
+                    <option value="either">Either / open</option>
+                    <option value="friends">Friendship</option>
+                    <option value="dating">Dating</option>
+                  </select>
+                  <p class="field-error" data-reg-error="connection_preference" hidden></p>
+                </div>
+              </div>
+              <div class="field hidden" id="r-gender-self-wrap">
+                <label for="r-gender-self">self-described gender</label>
+                <input id="r-gender-self" name="gender_self_describe" placeholder="how you describe your gender identity" />
+              </div>
+              <p class="helper" style="margin-bottom:0.75rem">Your gender is private. It is only used to evaluate guest-list eligibility for restricted quests.</p>
+              <div class="field">
+                <label for="r-vis">profile visibility</label>
+                <select id="r-vis" name="profile_visibility">
+                  <option value="public" selected>Public (Full name & details in quests)</option>
+                  <option value="first_name_only">First Name Only (Privacy-first badge)</option>
+                  <option value="minimal">Minimal (Avatar & first name only)</option>
+                </select>
+                <p class="helper">Choose how your name and details appear to others on quests.</p>
+              </div>
+              <div class="field">
+                <label for="r-interests">interests <span class="optional">(comma separated)</span></label>
+                <input id="r-interests" name="interests" placeholder="e.g. coffee, board games, indie music, photography" />
+              </div>
+              <p class="field-error" id="register-general-error" hidden></p>
+              <div class="form-actions" style="margin-top:1rem">
+                <button type="submit" class="btn btn-primary" style="width:100%">create student profile ✿</button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- Discover -->
+        <section id="view-discover" class="view hidden" aria-label="Discover">
+          <header class="page-header">
+            <h1>your next little adventure</h1>
+            <p class="subtitle">there's probably someone here who'd love to do this with you.</p>
+          </header>
+
+          <div class="filters" role="search">
+            <div class="filter-row" aria-label="Category filters">
+              <button type="button" class="chip active" data-category="All">All quests</button>
+              <button type="button" class="chip" data-category="Coffee">Coffee</button>
+              <button type="button" class="chip" data-category="Games">Games</button>
+              <button type="button" class="chip" data-category="Music">Music</button>
+              <button type="button" class="chip" data-category="Study">Study</button>
+              <button type="button" class="chip" data-category="Outdoors">Outdoors</button>
+              <button type="button" class="chip" data-category="Creative">Creative</button>
+              <button type="button" class="chip" data-category="Tech">Tech</button>
+              <button type="button" class="chip" data-category="Food">Food</button>
+            </div>
+            <div class="filter-row" aria-label="Intention filters">
+              <button type="button" class="chip chip-intent active" data-intention="all">All vibes</button>
+              <button type="button" class="chip chip-intent" data-intention="friends">Friends</button>
+              <button type="button" class="chip chip-intent" data-intention="dating">Dating</button>
+              <button type="button" class="chip chip-intent" data-intention="either">Either</button>
+            </div>
+          </div>
+
+          <div id="discover-status" class="status-slot" aria-live="polite"></div>
+          <div id="activity-grid" class="activity-grid"></div>
+        </section>
+
+        <!-- Detail -->
+        <section id="view-detail" class="view hidden" aria-label="Activity details"></section>
+
+        <!-- Create -->
+        <section id="view-create" class="view hidden" aria-label="Create a quest">
+          <header class="page-header">
+            <h1>plot a new quest</h1>
+            <p class="subtitle">plotting something fun? suspicious. we love it.</p>
+          </header>
+          <form id="create-form" class="create-form paper-card" novalidate>
+            <div class="field">
+              <label for="f-title">what's the plan, mastermind?</label>
+              <input id="f-title" name="title" maxlength="80" required placeholder="e.g. midnight chai & conspiracy theories" />
+              <p class="field-error" data-for="title" hidden></p>
+            </div>
+            <div class="field">
+              <label for="f-description">give us the lore.</label>
+              <textarea id="f-description" name="description" rows="3" maxlength="500" required placeholder="what's the vibe? what should people bring?"></textarea>
+              <p class="field-error" data-for="description" hidden></p>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label for="f-category">category</label>
+                <select id="f-category" name="category" required>
+                  <option value="">pick one</option>
+                  <option>Coffee</option>
+                  <option>Games</option>
+                  <option>Music</option>
+                  <option>Study</option>
+                  <option>Outdoors</option>
+                  <option>Creative</option>
+                  <option>Tech</option>
+                  <option>Food</option>
+                </select>
+                <p class="field-error" data-for="category" hidden></p>
+              </div>
+              <div class="field">
+                <label for="f-connection">connection vibe</label>
+                <select id="f-connection" name="connection_type" required>
+                  <option value="friends">Friendship</option>
+                  <option value="dating">Dating</option>
+                  <option value="either">Either / open</option>
+                </select>
+                <p class="field-error" data-for="connection_type" hidden></p>
+              </div>
+            </div>
+
+            <!-- Guest list & Gender eligibility -->
+            <div class="field">
+              <label for="f-invite">who's invited to this quest?</label>
+              <select id="f-invite" name="invite_policy" required>
+                <option value="everyone" selected>Everyone</option>
+                <option value="women">Women only</option>
+                <option value="men">Men only</option>
+                <option value="non_binary">Non-binary participants only</option>
+                <option value="custom">Custom selection...</option>
+              </select>
+              <p class="helper">Gender eligibility and connection vibe (dating/friendship) are separate settings. A women-only quest is not automatically classified as dating.</p>
+              <div id="custom-genders-wrap" class="custom-genders-wrap hidden" style="margin-top:0.6rem">
+                <label style="font-size:0.88rem">select who is eligible:</label>
+                <div class="checkbox-group">
+                  <label><input type="checkbox" name="invite_gender" value="woman" /> Women</label>
+                  <label><input type="checkbox" name="invite_gender" value="man" /> Men</label>
+                  <label><input type="checkbox" name="invite_gender" value="non_binary" /> Non-binary</label>
+                  <label><input type="checkbox" name="invite_gender" value="self_describe" /> Self-described</label>
+                </div>
+              </div>
+              <p class="field-error" data-for="invite_policy" hidden></p>
+              <p class="field-error" data-for="invite_genders" hidden></p>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="f-date">when?</label>
+                <input id="f-date" name="date" type="date" required />
+                <p class="field-error" data-for="starts_at" hidden></p>
+              </div>
+              <div class="field">
+                <label for="f-start">start time</label>
+                <input id="f-start" name="start_time" type="time" required />
+              </div>
+              <div class="field">
+                <label for="f-end">end time <span class="optional">(optional)</span></label>
+                <input id="f-end" name="end_time" type="time" />
+                <p class="field-error" data-for="ends_at" hidden></p>
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field grow">
+                <label for="f-venue">where's the side quest happening?</label>
+                <input id="f-venue" name="venue" maxlength="120" required placeholder="e.g. Library steps, Food Court" />
+                <p class="field-error" data-for="venue" hidden></p>
+              </div>
+              <div class="field">
+                <label for="f-capacity">how many people fit in this episode?</label>
+                <input id="f-capacity" name="capacity" type="number" min="2" max="50" value="6" required />
+                <p class="field-error" data-for="capacity" hidden></p>
+              </div>
+            </div>
+            <div class="field">
+              <label for="f-tags">interest tags <span class="optional">(comma separated)</span></label>
+              <input id="f-tags" name="tags" placeholder="coffee, conversations, playlists" />
+              <p class="helper">these help recommend your quest to the right people.</p>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">publish quest ✦</button>
+            </div>
+          </form>
+        </section>
+
+        <!-- My quests -->
+        <section id="view-my-quests" class="view hidden" aria-label="My quests">
+          <header class="page-header">
+            <h1>your quest log</h1>
+            <p class="subtitle">adventures you've joined, hosted, or already survived.</p>
+          </header>
+          <div id="my-quests-content"></div>
+        </section>
+
+        <!-- Profile -->
+        <section id="view-profile" class="view hidden" aria-label="Profile">
+          <header class="page-header">
+            <h1>your little corner</h1>
+            <p class="subtitle">campus identity & preferences · estimated from your university cohort.</p>
+          </header>
+          <div id="profile-content"></div>
+        </section>
+      </main>
+
+      <nav class="bottom-nav mobile-nav" aria-label="Mobile sections">
+        <button type="button" class="nav-item" data-nav="discover"><span aria-hidden="true">✦</span> Discover</button>
+        <button type="button" class="nav-item" data-nav="my-quests"><span aria-hidden="true">✿</span> My quests</button>
+        <button type="button" class="nav-item" data-nav="create"><span aria-hidden="true">＋</span> Create</button>
+        <button type="button" class="nav-item" data-nav="profile"><span aria-hidden="true">☺</span> Profile</button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Report Modal -->
+  <div id="report-modal" class="modal-root hidden" role="presentation">
+    <div class="modal-backdrop" data-close-report></div>
+    <div class="modal-dialog dialogue" role="dialog" aria-modal="true" aria-labelledby="report-title" tabindex="-1">
+      <div class="dialogue-mascot" aria-hidden="true" style="font-size:2rem">🛡️</div>
+      <div class="dialogue-body" style="width:100%">
+        <h2 id="report-title" style="font-size:1.15rem; margin-bottom:0.5rem">Report Quest</h2>
+        <p style="font-size:0.88rem; color:var(--muted-ink); margin-bottom:0.75rem">Help keep the Mahindra University community safe and welcoming.</p>
+        <textarea id="report-reason" rows="3" placeholder="Tell our student moderators what seems inappropriate or concerning..." style="width:100%; margin-bottom:0.85rem"></textarea>
+        <div class="dialogue-actions">
+          <button type="button" class="btn btn-danger" id="btn-submit-report">submit report</button>
+          <button type="button" class="btn btn-ghost" data-close-report>cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal dialog -->
+  <div id="modal-root" class="modal-root hidden" role="presentation">
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-dialog dialogue" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1">
+      <div class="dialogue-mascot" aria-hidden="true">
+        <svg viewBox="0 0 64 64" width="48" height="48">
+          <circle cx="32" cy="32" r="28" fill="#D9CCFF" stroke="#453A55" stroke-width="3"/>
+          <circle cx="22" cy="28" r="4" fill="#393149"/>
+          <circle cx="42" cy="28" r="4" fill="#393149"/>
+          <path d="M22 42 Q32 48 42 42" fill="none" stroke="#393149" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="dialogue-body">
+        <h2 id="modal-title" class="sr-only">Message</h2>
+        <p id="modal-message" class="dialogue-text"></p>
+        <div id="modal-actions" class="dialogue-actions"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toasts -->
+  <div id="toast-root" class="toast-root" aria-live="polite" aria-relevant="additions"></div>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+</body>
+</html>
