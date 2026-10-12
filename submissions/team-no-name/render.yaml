@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: sortling-bot
+    runtime: docker
+    plan: free
+    region: singapore
+    envVars:
+      - key: PORT
+        value: "10000"
+      - key: DISCORD_TOKEN
+        sync: false
+      - key: DATABASE_URL
+        value: sqlite:////var/data/sorts.db
+      - key: LOG_LEVEL
+        value: INFO
+    disk:
+      name: sorts-data
+      mountPath: /var/data
+      sizeGB: 1
