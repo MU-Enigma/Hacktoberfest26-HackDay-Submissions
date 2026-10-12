@@ -24,3 +24,4 @@ coverage/
 .vscode/
 .DS_Store
 Thumbs.db
+"laundry.db" 
