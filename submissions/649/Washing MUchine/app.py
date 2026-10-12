@@ -102,6 +102,24 @@ def dashboard():
     conn.close()
     return render_template_string(DASHBOARD_TEMPLATE, machines=machines, queue=queue)
 
+@app.route('/reset-db')
+def reset_db():
+    conn = get_db()
+    conn.execute("""
+        UPDATE machines 
+        SET status = 'Available', 
+            current_user_name = NULL, 
+            current_user_phone = NULL, 
+            start_time = NULL, 
+            reserved_for_name = NULL, 
+            reserved_for_phone = NULL, 
+            reservation_expiry = NULL
+    """)
+    conn.execute("DELETE FROM queue")
+    conn.commit()
+    conn.close()
+    return "✨ Database reset successfully! All machines are now Available and the queue is empty. <a href='/'>Go to Dashboard</a>"
+
 @app.route('/machine/<int:machine_id>', methods=['GET', 'POST'])
 def scan_qr(machine_id):
     conn = get_db()
