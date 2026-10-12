@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ profile.display_name }} · SideQuest Profile · Mahindra University</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <style>
+    .profile-page-container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem 4rem;
+    }
+    .profile-hero {
+      background: var(--paper);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 2rem;
+      position: relative;
+    }
+    .hero-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .avatar-huge {
+      width: 5rem;
+      height: 5rem;
+      border-radius: 50%;
+      background: var(--paper-soft);
+      border: 3px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      font-size: 2.2rem;
+    }
+    .avatar-huge img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .profile-facts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 0.5rem;
+    }
+    .quest-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.25rem;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="profile-page-container">
+    <nav style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem">
+      <a href="/" class="btn btn-ghost">← Back to Discover</a>
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">★</span>
+        <span class="brand-name">SideQuest</span>
+      </div>
+    </nav>
+
+    <!-- Profile Hero Card -->
+    <article class="profile-hero pastel-butter">
+      <div class="hero-top">
+        <div class="avatar-huge">
+          {% if profile.avatar_url %}
+            <img src="{{ profile.avatar_url }}" alt="{{ profile.display_name }}" />
+          {% else %}
+            <span>
+              {% if profile.default_avatar == 'star' %}★{% elif profile.default_avatar == 'blob' %}🫧{% elif profile.default_avatar == 'flower' %}✿{% else %}✧{% endif %}
+            </span>
+          {% endif %}
+        </div>
+        <div style="flex:1; min-width:220px">
+          <div style="display:flex; flex-wrap:wrap; align-items:center; gap:0.5rem">
+            <h1 style="font-size:1.8rem; margin:0">{{ profile.display_name }}</h1>
+            {% if profile.badge_label %}
+              <span class="badge-year" style="font-size:0.85rem">{{ profile.badge_label }}</span>
+            {% endif %}
+          </div>
+          {% if profile.email and profile.profile_visibility == 'public' %}
+            <p style="margin:0.25rem 0 0; color:var(--muted-ink); font-size:0.9rem"><code>{{ profile.email }}</code></p>
+          {% endif %}
+          
+          <div class="profile-facts">
+            <span class="badge badge-{{ profile.connection_preference }}">
+              {% if profile.connection_preference == 'friends' %}Friendship
+              {% elif profile.connection_preference == 'dating' %}Dating
+              {% else %}Either / Open Vibe{% endif %}
+            </span>
+            <span class="badge" style="background:var(--paper)">{{ profile.joined_count }} adventures joined</span>
+            <span class="badge" style="background:var(--paper)">{{ profile.hosted_count }} quests hosted</span>
+          </div>
+        </div>
+      </div>
+
+      {% if profile.bio %}
+        <div style="background:rgba(255,255,255,0.7); border:2px dashed var(--border); border-radius:16px; padding:1rem; margin-bottom:1.25rem">
+          <p style="font-size:1.05rem; line-height:1.45; margin:0; color:var(--ink)">{{ profile.bio }}</p>
+        </div>
+      {% endif %}
+
+      {% if profile.interests %}
+        <div style="margin-top:0.75rem">
+          <h3 style="font-size:0.95rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted-ink); margin-bottom:0.4rem">interests & obsessions</h3>
+          <div class="tag-row">
+            {% for interest in profile.interests %}
+              <span class="tag">#{{ interest }}</span>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    </article>
+
+    <!-- Quests Hosted by User -->
+    <section style="margin-top:2.5rem">
+      <h2 style="font-size:1.4rem; margin-bottom:0.5rem">✦ Quests Hosted by {{ profile.first_name }}</h2>
+      {% if profile.hosted_activities %}
+        <div class="quest-preview-grid">
+          {% for a in profile.hosted_activities %}
+            <article class="activity-card" style="margin:0">
+              <div class="quest-meta">
+                <span class="badge">{{ a.category }}</span>
+                <span class="badge badge-{{ a.connection_type }}">{{ a.connection_type }}</span>
+              </div>
+              <h3 style="font-size:1.15rem; margin:0.4rem 0"><a href="/?activity={{ a.id }}" style="color:var(--ink); text-decoration:none">{{ a.title }}</a></h3>
+              <p class="desc">{{ a.description }}</p>
+              <div class="quest-facts" style="margin-top:0.75rem; font-size:0.85rem">
+                <span>🗓 {{ a.starts_at[:10] }}</span>
+                <span>📍 {{ a.venue }}</span>
+                <span>👥 {{ a.participant_count }}/{{ a.capacity }} spots</span>
+              </div>
+              <div style="margin-top:1rem">
+                <a href="/?activity={{ a.id }}" class="btn btn-butter" style="font-size:0.85rem">view quest →</a>
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="paper-card" style="text-align:center; padding:1.5rem">
+          <p style="margin:0; color:var(--muted-ink)">No active quests hosted yet.</p>
+        </div>
+      {% endif %}
+    </section>
+
+    <!-- Quests Joined by User -->
+    <section style="margin-top:2.5rem">
+      <h2 style="font-size:1.4rem; margin-bottom:0.5rem">✿ Adventures Joined ({{ profile.joined_count }})</h2>
+      {% if profile.joined_activities %}
+        <div class="quest-preview-grid">
+          {% for a in profile.joined_activities %}
+            <article class="activity-card pastel-sky" style="margin:0">
+              <div class="quest-meta">
+                <span class="badge">{{ a.category }}</span>
+                <span class="badge badge-{{ a.connection_type }}">{{ a.connection_type }}</span>
+              </div>
+              <h3 style="font-size:1.15rem; margin:0.4rem 0"><a href="/?activity={{ a.id }}" style="color:var(--ink); text-decoration:none">{{ a.title }}</a></h3>
+              <p class="desc">{{ a.description }}</p>
+              <div class="quest-facts" style="margin-top:0.75rem; font-size:0.85rem">
+                <span>🗓 {{ a.starts_at[:10] }}</span>
+                <span>📍 {{ a.venue }}</span>
+                <span>👥 Hosted by {{ a.host.display_name }}</span>
+              </div>
+              <div style="margin-top:1rem">
+                <a href="/?activity={{ a.id }}" class="btn btn-mint" style="font-size:0.85rem">view quest →</a>
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="paper-card" style="text-align:center; padding:1.5rem">
+          <p style="margin:0; color:var(--muted-ink)">Not attending any upcoming quests right now.</p>
+        </div>
+      {% endif %}
+    </section>
+  </div>
+</body>
+</html>
+

@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Log In · SideQuest · Mahindra University</title>
+  <meta name="description" content="Log in to SideQuest campus adventures at Mahindra University." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <style>
+    .login-container {
+      max-width: 580px;
+      margin: 2.5rem auto;
+      padding: 0 1rem 4rem;
+    }
+    .auth-header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .auth-header .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      color: var(--ink);
+    }
+    .otp-box {
+      background: var(--paper-soft);
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      margin-top: 1rem;
+    }
+    .demo-bar {
+      margin-top: 2rem;
+      background: var(--paper);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.25rem;
+    }
+    .demo-bar h3 {
+      font-size: 1.05rem;
+      margin-bottom: 0.5rem;
+    }
+    .demo-grid-compact {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 0.5rem;
+      margin-top: 0.6rem;
+    }
+    .demo-btn-chip {
+      background: var(--paper-soft);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 0.45rem 0.6rem;
+      text-align: left;
+      font-size: 0.82rem;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.15s ease;
+    }
+    .demo-btn-chip:hover {
+      background: var(--butter);
+      transform: translate(-1px, -1px);
+    }
+    .demo-btn-chip strong {
+      display: block;
+      color: var(--ink);
+      font-size: 0.85rem;
+    }
+    .demo-btn-chip span {
+      color: var(--muted-ink);
+      font-size: 0.72rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <header class="auth-header">
+      <a href="/" class="brand" aria-label="SideQuest Home">
+        <span class="brand-mark" aria-hidden="true" style="font-size:1.8rem">★</span>
+        <span class="brand-name" style="font-size:2rem">SideQuest</span>
+      </a>
+      <p style="color:var(--muted-ink); font-size:0.95rem; margin-top:0.35rem">
+        Mahindra University Campus Portal · <a href="/" style="color:var(--ink); font-weight:700">← Back to Discover</a>
+      </p>
+    </header>
+
+    <div class="dialogue-panel" style="margin-bottom:1.5rem">
+      <div aria-hidden="true" style="font-size:1.8rem">🌸</div>
+      <div class="bubble">
+        <p><strong>who goes there?</strong> identify yourself, student traveler ✿</p>
+      </div>
+    </div>
+
+    <!-- Switcher tabs -->
+    <div class="auth-tabs" role="tablist">
+      <button type="button" class="auth-tab-btn {{ 'active' if tab != 'register' else '' }}" id="tab-btn-login">Log In</button>
+      <button type="button" class="auth-tab-btn {{ 'active' if tab == 'register' else '' }}" id="tab-btn-register">Register Account</button>
+    </div>
+
+    <!-- Login Card -->
+    <div id="pane-login" class="paper-card auth-card {{ 'hidden' if tab == 'register' else '' }}">
+      <form id="form-login" novalidate>
+        <div class="field">
+          <label for="l-email">University Email</label>
+          <input id="l-email" name="email" type="email" placeholder="se25ucse100@{{ university_domain }}" required />
+          <p class="field-error" id="err-login-email" hidden></p>
+        </div>
+        <div class="field">
+          <div style="display:flex; justify-content:space-between; align-items:center">
+            <label for="l-password" style="margin-bottom:0">Password</label>
+            <button type="button" class="btn btn-ghost" id="btn-forgot-pw" style="padding:0; font-size:0.8rem; text-decoration:underline">forgot password?</button>
+          </div>
+          <input id="l-password" name="password" type="password" placeholder="••••••••" required style="margin-top:0.3rem" />
+          <p class="field-error" id="err-login-password" hidden></p>
+        </div>
+        <p class="field-error" id="err-login-general" hidden></p>
+        <button type="submit" class="btn btn-primary" style="width:100%; margin-top:0.5rem">log in to questing ✦</button>
+      </form>
+    </div>
+
+    <!-- Register Card -->
+    <div id="pane-register" class="paper-card auth-card {{ 'hidden' if tab != 'register' else '' }}">
+      <div class="safety-notice" style="margin-top:0; margin-bottom:1.25rem">
+        <p>ⓘ <strong>Campus exclusive:</strong> Registration requires your <code>@{{ university_domain }}</code> email. 6-digit OTP verification is in prototype demo mode!</p>
+      </div>
+
+      <form id="form-register" novalidate>
+        <!-- Step 1: Account details -->
+        <div id="reg-step-1">
+          <div class="field">
+            <label for="r-email">University Email</label>
+            <input id="r-email" name="email" type="email" placeholder="se26uecm024@{{ university_domain }}" required />
+            <p class="helper">Format: cohort prefix + branch code (e.g. <code>se26uecm024@{{ university_domain }}</code>). Automatically estimates study year and branch badge!</p>
+            <p class="field-error" id="err-reg-email" hidden></p>
+          </div>
+
+          <div class="field">
+            <label for="r-name">Display Name</label>
+            <input id="r-name" name="display_name" maxlength="40" placeholder="e.g. Tara Rao" required />
+            <p class="field-error" id="err-reg-name" hidden></p>
+          </div>
+
+          <div class="field">
+            <label for="r-password">Password</label>
+            <input id="r-password" name="password" type="password" minlength="6" placeholder="at least 6 characters" required />
+            <p class="field-error" id="err-reg-password" hidden></p>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="r-gender">Gender <span class="optional">(optional)</span></label>
+              <select id="r-gender" name="gender">
+                <option value="prefer_not_to_say">Prefer not to say</option>
+                <option value="woman">Woman</option>
+                <option value="man">Man</option>
+                <option value="non_binary">Non-binary</option>
+                <option value="self_describe">Self-describe...</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="r-pref">Connection Vibe</label>
+              <select id="r-pref" name="connection_preference">
+                <option value="either">Either / open</option>
+                <option value="friends">Friendship</option>
+                <option value="dating">Dating</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field hidden" id="r-gender-self-wrap">
+            <label for="r-gender-self">Self-described Gender</label>
+            <input id="r-gender-self" name="gender_self_describe" placeholder="how you describe your gender identity" />
+          </div>
+
+          <div class="field">
+            <label for="r-vis">Profile Visibility</label>
+            <select id="r-vis" name="profile_visibility">
+              <option value="public" selected>Public (Full name & bio in quests)</option>
+              <option value="first_name_only">First Name Only (Privacy-first badge)</option>
+              <option value="minimal">Minimal (Avatar & first name only)</option>
+            </select>
+            <p class="helper">Controls how you appear to others on quests noticeboards.</p>
+          </div>
+
+          <div class="field">
+            <label for="r-interests">Interests <span class="optional">(comma separated)</span></label>
+            <input id="r-interests" name="interests" placeholder="e.g. coffee, board games, indie music, photography" />
+          </div>
+
+          <button type="button" class="btn btn-primary" id="btn-proceed-otp" style="width:100%; margin-top:0.75rem">continue to email verification code →</button>
+        </div>
+
+        <!-- Step 2: OTP Verification Drawer -->
+        <div id="reg-step-2" class="otp-box hidden">
+          <h3 style="font-size:1.1rem; margin-bottom:0.4rem">✦ Campus Email Verification (Demo Mode)</h3>
+          <p style="font-size:0.85rem; color:var(--muted-ink); margin-bottom:0.75rem">
+            In production, a 6-digit code is dispatched to your <code>@{{ university_domain }}</code> inbox. For this evaluation prototype, use <strong>123456</strong>.
+          </p>
+          
+          <div class="field">
+            <label for="r-otp">6-Digit Verification Code</label>
+            <div style="display:flex; gap:0.5rem">
+              <input id="r-otp" name="otp" type="text" maxlength="6" placeholder="123456" style="font-size:1.2rem; letter-spacing:0.25em; text-align:center; font-weight:800; width:160px" />
+              <button type="button" class="btn btn-butter" id="btn-autofill-otp" style="font-size:0.85rem">Auto-fill 123456 ⚡</button>
+            </div>
+            <p class="field-error" id="err-reg-otp" hidden></p>
+          </div>
+
+          <div style="display:flex; gap:0.75rem; margin-top:1rem">
+            <button type="submit" class="btn btn-primary" id="btn-finish-register" style="flex:1">verify & create student profile ✿</button>
+            <button type="button" class="btn btn-ghost" id="btn-back-step-1">back</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Quick Demo Switcher -->
+    <section class="demo-bar">
+      <h3>✦ One-Click Demo Student Explorer</h3>
+      <p class="helper">Select any fictional Mahindra University student or administrator to instantly explore with their profile:</p>
+      <div class="demo-grid-compact">
+        <button type="button" class="demo-btn-chip" data-login-email="se25ucse100@{{ university_domain }}">
+          <strong>Aanya Kapoor</strong>
+          <span>SE25 · CSE · 2nd Yr</span>
+        </button>
+        <button type="button" class="demo-btn-chip" data-login-email="se24ucse002@{{ university_domain }}">
+          <strong>Rohan Mehta</strong>
+          <span>SE24 · CSE · 3rd Yr</span>
+        </button>
+        <button type="button" class="demo-btn-chip" data-login-email="se26uecm024@{{ university_domain }}">
+          <strong>Sara Iqbal</strong>
+          <span>SE26 · ECM · 1st Yr</span>
+        </button>
+        <button type="button" class="demo-btn-chip" data-login-email="se25uaid004@{{ university_domain }}">
+          <strong>Dev Patel</strong>
+          <span>SE25 · AI & DS · 2nd Yr</span>
+        </button>
+        <button type="button" class="demo-btn-chip" data-login-email="se23ucse005@{{ university_domain }}">
+          <strong>Maya Sharma</strong>
+          <span>SE23 · CSE · 4th Yr</span>
+        </button>
+        <button type="button" class="demo-btn-chip" data-login-email="se24umech006@{{ university_domain }}">
+          <strong>Kabir Nair</strong>
+          <span>SE24 · Mech · 3rd Yr</span>
+        </button>
+        <button type="button" class="demo-btn-chip" data-login-email="se26ucse007@{{ university_domain }}">
+          <strong>Priya Sen</strong>
+          <span>SE26 · CSE · 1st Yr</span>
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <!-- Modal for Forgot Password / Notices -->
+  <div id="modal-root" class="modal-root hidden" role="presentation">
+    <div class="modal-backdrop" id="modal-backdrop"></div>
+    <div class="modal-dialog dialogue" role="dialog" aria-modal="true" tabindex="-1">
+      <div class="dialogue-mascot" aria-hidden="true" style="font-size:2rem">💌</div>
+      <div class="dialogue-body">
+        <h2 id="modal-title" style="font-size:1.15rem; margin-bottom:0.4rem">Password Reset Demo</h2>
+        <p id="modal-msg" style="font-size:0.92rem; line-height:1.45; color:var(--ink)"></p>
+        <div class="dialogue-actions" style="margin-top:1rem">
+          <button type="button" class="btn btn-primary" id="modal-ok">Got it ✿</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-root" class="toast-root" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const $ = (sel) => document.querySelector(sel);
+      const $$ = (sel) => [...document.querySelectorAll(sel)];
+
+      function toast(msg, variant = "ok") {
+        const t = document.createElement("div");
+        t.className = `toast ${variant === "error" ? "error" : variant === "warn" ? "warn" : ""}`;
+        t.textContent = msg;
+        $("#toast-root").appendChild(t);
+        setTimeout(() => t.remove(), 3200);
+      }
+
+      function showModal(title, message) {
+        $("#modal-title").textContent = title;
+        $("#modal-msg").innerHTML = message;
+        $("#modal-root").classList.remove("hidden");
+      }
+      function closeModal() {
+        $("#modal-root").classList.add("hidden");
+      }
+      $("#modal-backdrop").addEventListener("click", closeModal);
+      $("#modal-ok").addEventListener("click", closeModal);
+
+      // Tabs
+      $("#tab-btn-login").addEventListener("click", () => {
+        $("#tab-btn-login").classList.add("active");
+        $("#tab-btn-register").classList.remove("active");
+        $("#pane-login").classList.remove("hidden");
+        $("#pane-register").classList.add("hidden");
+      });
+
+      $("#tab-btn-register").addEventListener("click", () => {
+        $("#tab-btn-register").classList.add("active");
+        $("#tab-btn-login").classList.remove("active");
+        $("#pane-register").classList.remove("hidden");
+        $("#pane-login").classList.add("hidden");
+      });
+
+      // Gender self describe
+      $("#r-gender").addEventListener("change", (e) => {
+        $("#r-gender-self-wrap").classList.toggle("hidden", e.target.value !== "self_describe");
+      });
+
+      // Quick Demo Switcher
+      $$("[data-login-email]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const email = btn.dataset.loginEmail;
+          try {
+            toast("Logging in as " + email + "...");
+            const res = await fetch("/api/auth/demo", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || "Demo login failed");
+            toast("Welcome aboard, " + data.user.display_name + "!");
+            setTimeout(() => window.location.href = "/", 600);
+          } catch (err) {
+            toast(err.message, "error");
+          }
+        });
+      });
+
+      // Forgot password demo
+      $("#btn-forgot-pw").addEventListener("click", async () => {
+        const email = $("#l-email").value.trim();
+        showModal(
+          "Demo Mode · Forgot Password",
+          "<strong>Password Reset Notice:</strong><br/>Email verification and outbound SMTP are disabled in this evaluation prototype.<br/><br/>You can log into any student account instantly using the Demo Switcher chips below, or enter password <code>demo1234</code>!"
+        );
+      });
+
+      // Log in form submit
+      $("#form-login").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        $("#err-login-general").hidden = true;
+        const email = $("#l-email").value.trim();
+        const password = $("#l-password").value;
+        if (!email || !password) {
+          $("#err-login-general").textContent = "Please fill in both email and password.";
+          $("#err-login-general").hidden = false;
+          return;
+        }
+
+        try {
+          const res = await fetch("/api/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || "Login failed");
+          toast("Welcome back, " + data.user.display_name + "! ✿");
+          setTimeout(() => window.location.href = "/", 600);
+        } catch (err) {
+          $("#err-login-general").textContent = err.message;
+          $("#err-login-general").hidden = false;
+        }
+      });
+
+      // Registration step 1 -> step 2 (OTP)
+      $("#btn-proceed-otp").addEventListener("click", () => {
+        const email = $("#r-email").value.trim().toLowerCase();
+        const name = $("#r-name").value.trim();
+        const pw = $("#r-password").value;
+        
+        let hasError = false;
+        $("#err-reg-email").hidden = true;
+        $("#err-reg-name").hidden = true;
+        $("#err-reg-password").hidden = true;
+
+        if (!email || !email.includes("@")) {
+          $("#err-reg-email").textContent = "Valid campus email required.";
+          $("#err-reg-email").hidden = false;
+          hasError = true;
+        } else if (!email.endsWith("@{{ university_domain }}")) {
+          $("#err-reg-email").textContent = "Must use @{{ university_domain }} university email.";
+          $("#err-reg-email").hidden = false;
+          hasError = true;
+        }
+
+        if (name.length < 2) {
+          $("#err-reg-name").textContent = "Display name needs at least 2 characters.";
+          $("#err-reg-name").hidden = false;
+          hasError = true;
+        }
+
+        if (pw.length < 6) {
+          $("#err-reg-password").textContent = "Password needs at least 6 characters.";
+          $("#err-reg-password").hidden = false;
+          hasError = true;
+        }
+
+        if (hasError) return;
+
+        // Advance to step 2 OTP
+        $("#reg-step-1").classList.add("hidden");
+        $("#reg-step-2").classList.remove("hidden");
+      });
+
+      $("#btn-back-step-1").addEventListener("click", () => {
+        $("#reg-step-2").classList.add("hidden");
+        $("#reg-step-1").classList.remove("hidden");
+      });
+
+      $("#btn-autofill-otp").addEventListener("click", () => {
+        $("#r-otp").value = "123456";
+        toast("Filled demo OTP: 123456 ⚡");
+      });
+
+      // Finish registration
+      $("#form-register").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const otp = $("#r-otp").value.trim();
+        $("#err-reg-otp").hidden = true;
+
+        if (otp !== "123456") {
+          $("#err-reg-otp").textContent = "In this demo, enter verification code: 123456";
+          $("#err-reg-otp").hidden = false;
+          return;
+        }
+
+        const email = $("#r-email").value.trim().toLowerCase();
+        const display_name = $("#r-name").value.trim();
+        const password = $("#r-password").value;
+        const gender = $("#r-gender").value;
+        const gender_self_describe = $("#r-gender-self").value.trim();
+        const connection_preference = $("#r-pref").value;
+        const profile_visibility = $("#r-vis").value;
+        const interests = $("#r-interests").value.split(",").map(s => s.trim()).filter(Boolean);
+
+        try {
+          const res = await fetch("/api/auth/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email,
+              display_name,
+              password,
+              gender,
+              gender_self_describe,
+              connection_preference,
+              profile_visibility,
+              interests
+            })
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || (data.fields ? Object.values(data.fields).join(", ") : "Registration failed"));
+          toast("Profile created! Welcome to SideQuest ✿");
+          setTimeout(() => window.location.href = "/", 700);
+        } catch (err) {
+          $("#err-reg-otp").textContent = err.message;
+          $("#err-reg-otp").hidden = false;
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
+

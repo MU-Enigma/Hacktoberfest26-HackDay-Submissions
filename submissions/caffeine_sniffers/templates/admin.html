@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SideQuest Admin · Mahindra University</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <style>
+    .admin-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 4rem;
+    }
+    .admin-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding: 0.75rem 1.25rem;
+      background: var(--paper);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+    }
+    .admin-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+    .admin-stat-card {
+      background: var(--paper);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+    .admin-stat-card .num {
+      font-family: var(--font-display);
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1;
+      margin-bottom: 0.3rem;
+    }
+    .admin-stat-card .label {
+      font-weight: 700;
+      color: var(--muted-ink);
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+    }
+    .admin-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px dashed var(--border);
+      padding-bottom: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .admin-tab-btn {
+      background: var(--paper);
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 0.5rem 1.25rem;
+      font-weight: 700;
+      box-shadow: var(--shadow);
+      transition: all 0.15s ease;
+    }
+    .admin-tab-btn.active {
+      background: var(--butter);
+      transform: translate(-1px, -1px);
+    }
+    .admin-search-bar {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+    }
+    .admin-search-bar input {
+      flex: 1;
+      min-width: 240px;
+      padding: 0.6rem 1rem;
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      background: var(--paper);
+    }
+    .admin-table-wrap {
+      background: var(--paper);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow-x: auto;
+      margin-bottom: 2rem;
+    }
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+    .admin-table th, .admin-table td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid rgba(69, 58, 85, 0.15);
+      vertical-align: middle;
+    }
+    .admin-table th {
+      background: rgba(255, 227, 138, 0.4);
+      font-family: var(--font-display);
+      font-weight: 600;
+    }
+    .admin-table tr:last-child td {
+      border-bottom: none;
+    }
+    .badge-status {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      border: 1px solid var(--border);
+    }
+    .badge-active { background: var(--mint); }
+    .badge-suspended { background: var(--orange); }
+    .badge-open { background: var(--butter); }
+    .badge-reviewed { background: var(--sky); }
+    .badge-dismissed { background: #eee; }
+  </style>
+</head>
+<body>
+  <div class="admin-container">
+    <header class="admin-nav">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">★</span>
+        <span class="brand-name">SideQuest Moderator Desk</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap">
+        <span class="badge" style="background:var(--lavender)">Admin: {{ me.display_name }}</span>
+        <button type="button" class="btn btn-danger" id="btn-open-mass-reset" style="font-size:0.85rem">⚠️ Mass Reset DB</button>
+        <a href="/" class="btn btn-ghost" style="font-size:0.9rem">← Back to App</a>
+        <button type="button" class="btn btn-ghost" id="admin-logout" style="font-size:0.9rem">Log Out</button>
+      </div>
+    </header>
+
+    <div class="dialogue-panel" style="margin-bottom: 2rem;">
+      <div aria-hidden="true" style="font-size: 1.8rem">🛡️</div>
+      <div class="bubble">
+        <p><strong>Campus moderation desk:</strong> keep SideQuest adventures respectful, inclusive, and fun. Fictional demo environment for Mahindra University.</p>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <section class="admin-stats-grid">
+      <div class="admin-stat-card pastel-butter">
+        <div class="num" id="stat-users">-</div>
+        <div class="label">Registered Users</div>
+      </div>
+      <div class="admin-stat-card pastel-mint">
+        <div class="num" id="stat-activities">-</div>
+        <div class="label">Active Quests</div>
+      </div>
+      <div class="admin-stat-card pastel-pink">
+        <div class="num" id="stat-reports">-</div>
+        <div class="label">Open Reports</div>
+      </div>
+      <div class="admin-stat-card pastel-orange">
+        <div class="num" id="stat-suspended">-</div>
+        <div class="label">Suspended Users</div>
+      </div>
+    </section>
+
+    <!-- Tabs -->
+    <div class="admin-tabs" role="tablist">
+      <button type="button" class="admin-tab-btn active" data-tab="activities">Quests Noticeboard</button>
+      <button type="button" class="admin-tab-btn" data-tab="users">Student Directory</button>
+      <button type="button" class="admin-tab-btn" data-tab="reports">Community Reports</button>
+    </div>
+
+    <!-- Quests Tab -->
+    <section id="tab-activities" class="admin-tab-pane">
+      <div class="admin-search-bar">
+        <input type="search" id="search-activities" placeholder="Search quests by title, category, or host..." />
+        <button type="button" class="btn btn-butter" id="btn-refresh-activities">Refresh</button>
+      </div>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Quest Title</th>
+              <th>Category</th>
+              <th>Vibe</th>
+              <th>Guest List</th>
+              <th>Host</th>
+              <th>When</th>
+              <th>Spots</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-activities">
+            <tr><td colspan="10" style="text-align:center">Loading quests...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Users Tab -->
+    <section id="tab-users" class="admin-tab-pane hidden">
+      <div class="admin-search-bar">
+        <input type="search" id="search-users" placeholder="Search students by name or university email..." />
+        <button type="button" class="btn btn-butter" id="btn-refresh-users">Refresh</button>
+      </div>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>University Email</th>
+              <th>Study Year</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-users">
+            <tr><td colspan="7" style="text-align:center">Loading student profiles...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Reports Tab -->
+    <section id="tab-reports" class="admin-tab-pane hidden">
+      <div class="admin-search-bar">
+        <select id="filter-reports-status" style="padding:0.6rem 1rem; border:2px solid var(--border); border-radius:14px; background:var(--paper)">
+          <option value="">All statuses</option>
+          <option value="open" selected>Open reports</option>
+          <option value="reviewed">Reviewed</option>
+          <option value="dismissed">Dismissed</option>
+        </select>
+        <button type="button" class="btn btn-butter" id="btn-refresh-reports">Refresh</button>
+      </div>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Reporter</th>
+              <th>Reported Quest</th>
+              <th>Reason</th>
+              <th>Reported At</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-reports">
+            <tr><td colspan="7" style="text-align:center">Loading community reports...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  <!-- Edit User Modal -->
+  <div id="edit-user-modal" class="modal-root hidden" role="presentation">
+    <div class="modal-backdrop" data-close-edit-user></div>
+    <div class="modal-dialog dialogue" role="dialog" aria-modal="true" style="max-width:540px; width:100%" tabindex="-1">
+      <div class="dialogue-mascot" aria-hidden="true" style="font-size:2rem">✏️</div>
+      <div class="dialogue-body" style="width:100%">
+        <h2 style="font-size:1.2rem; margin-bottom:0.5rem">Edit Student Profile</h2>
+        <form id="edit-user-form">
+          <input type="hidden" id="eu-id" />
+          <div class="field" style="margin-bottom:0.6rem">
+            <label for="eu-name">Display Name</label>
+            <input id="eu-name" name="display_name" required />
+          </div>
+          <div class="field" style="margin-bottom:0.6rem">
+            <label for="eu-email">University Email</label>
+            <input id="eu-email" name="email" required />
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; margin-bottom:0.6rem">
+            <div class="field">
+              <label for="eu-role">Role</label>
+              <select id="eu-role" name="role">
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="eu-status">Account Status</label>
+              <select id="eu-status" name="is_suspended">
+                <option value="0">Active</option>
+                <option value="1">Suspended</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; margin-bottom:0.6rem">
+            <div class="field">
+              <label for="eu-gender">Gender</label>
+              <select id="eu-gender" name="gender">
+                <option value="prefer_not_to_say">Prefer not to say</option>
+                <option value="woman">Woman</option>
+                <option value="man">Man</option>
+                <option value="non_binary">Non-binary</option>
+                <option value="self_describe">Self-describe</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="eu-pref">Connection Vibe</label>
+              <select id="eu-pref" name="connection_preference">
+                <option value="either">Either / open</option>
+                <option value="friends">Friendship</option>
+                <option value="dating">Dating</option>
+              </select>
+            </div>
+          </div>
+          <div class="field" style="margin-bottom:0.6rem">
+            <label for="eu-vis">Profile Visibility</label>
+            <select id="eu-vis" name="profile_visibility">
+              <option value="public">Public</option>
+              <option value="first_name_only">First Name Only</option>
+              <option value="minimal">Minimal</option>
+            </select>
+          </div>
+          <div class="field" style="margin-bottom:0.6rem">
+            <label for="eu-bio">Bio</label>
+            <textarea id="eu-bio" name="bio" rows="2"></textarea>
+          </div>
+          <div class="dialogue-actions" style="margin-top:1rem">
+            <button type="submit" class="btn btn-primary">Save Changes ✿</button>
+            <button type="button" class="btn btn-ghost" data-close-edit-user>Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mass Reset Modal (5-Stage Warning Sequence) -->
+  <div id="mass-reset-modal" class="modal-root hidden" role="presentation">
+    <div class="modal-backdrop" data-close-reset></div>
+    <div class="modal-dialog dialogue warn" role="dialog" aria-modal="true" style="max-width:520px; width:100%" tabindex="-1">
+      <div class="dialogue-mascot" aria-hidden="true" style="font-size:2.2rem">⚠️</div>
+      <div class="dialogue-body" style="width:100%">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem">
+          <h2 style="font-size:1.15rem; color:#a13b4a; margin:0">Mass Database Reset</h2>
+          <span class="badge" id="reset-stage-badge" style="background:#FFE38A; font-weight:800">Warning 1 of 5</span>
+        </div>
+
+        <div id="reset-stage-1" class="reset-stage-content">
+          <p style="font-size:0.95rem; line-height:1.45; margin-bottom:0.8rem">
+            <strong>Warning 1 / 5:</strong> You are about to initiate a mass reset of the SideQuest database. This will restore default prototype records and delete test data.
+          </p>
+          <div class="dialogue-actions">
+            <button type="button" class="btn btn-danger" data-advance-reset="2">I understand, proceed to warning 2 →</button>
+            <button type="button" class="btn btn-ghost" data-close-reset>Cancel</button>
+          </div>
+        </div>
+
+        <div id="reset-stage-2" class="reset-stage-content hidden">
+          <p style="font-size:0.95rem; line-height:1.45; margin-bottom:0.8rem">
+            <strong>Warning 2 / 5:</strong> All custom quests plotted during evaluations, along with participant joins and spots filled, will be permanently deleted.
+          </p>
+          <div class="dialogue-actions">
+            <button type="button" class="btn btn-danger" data-advance-reset="3">I understand quests will be deleted →</button>
+            <button type="button" class="btn btn-ghost" data-close-reset>Cancel</button>
+          </div>
+        </div>
+
+        <div id="reset-stage-3" class="reset-stage-content hidden">
+          <p style="font-size:0.95rem; line-height:1.45; margin-bottom:0.8rem">
+            <strong>Warning 3 / 5:</strong> Any student accounts created through /login or /register during testing will be completely wiped. Only factory seed demo students and administrator <code>meldhee</code> will remain.
+          </p>
+          <div class="dialogue-actions">
+            <button type="button" class="btn btn-danger" data-advance-reset="4">I understand test accounts will be wiped →</button>
+            <button type="button" class="btn btn-ghost" data-close-reset>Cancel</button>
+          </div>
+        </div>
+
+        <div id="reset-stage-4" class="reset-stage-content hidden">
+          <p style="font-size:0.95rem; line-height:1.45; margin-bottom:0.8rem">
+            <strong>Warning 4 / 5:</strong> Default seeded students (Aanya, Rohan, Sara, Dev, Maya, Kabir, Priya) and administrator <code>meldhee</code> will be restored to pristine state. There is <strong>NO undo</strong>.
+          </p>
+          <div class="dialogue-actions">
+            <button type="button" class="btn btn-danger" data-advance-reset="5">Proceed to final confirmation →</button>
+            <button type="button" class="btn btn-ghost" data-close-reset>Cancel</button>
+          </div>
+        </div>
+
+        <div id="reset-stage-5" class="reset-stage-content hidden">
+          <p style="font-size:0.95rem; line-height:1.45; margin-bottom:0.8rem">
+            <strong>Warning 5 / 5 (FINAL GATE):</strong> To confirm complete reset to default demo state, please type <code>RESET</code> in the confirmation box below:
+          </p>
+          <input type="text" id="input-confirm-reset" placeholder="Type RESET here" style="font-weight:800; font-size:1.1rem; text-align:center; letter-spacing:0.15em; margin-bottom:1rem" />
+          <div class="dialogue-actions">
+            <button type="button" class="btn btn-danger" id="btn-execute-reset" disabled style="opacity:0.5">Execute Mass Reset 💣</button>
+            <button type="button" class="btn btn-ghost" data-close-reset>Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-root" class="toast-root" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const $ = (sel) => document.querySelector(sel);
+      const $$ = (sel) => [...document.querySelectorAll(sel)];
+
+      function toast(msg, variant = "ok") {
+        const t = document.createElement("div");
+        t.className = `toast ${variant === "error" ? "error" : variant === "warn" ? "warn" : ""}`;
+        t.textContent = msg;
+        $("#toast-root").appendChild(t);
+        setTimeout(() => t.remove(), 3200);
+      }
+
+      async function api(path, opts = {}) {
+        const res = await fetch(path, {
+          headers: { "Content-Type": "application/json" },
+          ...opts
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || data.message || "Request failed");
+        return data;
+      }
+
+      function escapeHtml(str) {
+        return String(str ?? "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      async function loadStats() {
+        try {
+          const stats = await api("/api/admin/stats");
+          $("#stat-users").textContent = stats.users;
+          $("#stat-activities").textContent = stats.activities;
+          $("#stat-reports").textContent = stats.open_reports;
+          $("#stat-suspended").textContent = stats.suspended_users;
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      async function loadActivities() {
+        const q = $("#search-activities").value.trim();
+        const tbody = $("#tbody-activities");
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center">Loading...</td></tr>';
+        try {
+          const data = await api(`/api/admin/activities?q=${encodeURIComponent(q)}`);
+          const acts = data.activities || [];
+          if (!acts.length) {
+            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:1.5rem">No quests found.</td></tr>';
+            return;
+          }
+          tbody.innerHTML = acts.map(a => {
+            const isCancelled = a.status === 'cancelled';
+            return `
+              <tr>
+                <td>#${a.id}</td>
+                <td><strong>${escapeHtml(a.title)}</strong></td>
+                <td><span class="badge">${escapeHtml(a.category)}</span></td>
+                <td><span class="badge badge-${escapeHtml(a.connection_type)}">${escapeHtml(a.connection_type)}</span></td>
+                <td>${escapeHtml(a.invite_label || "Everyone")}</td>
+                <td>${escapeHtml(a.host?.display_name || "Someone")}</td>
+                <td>${escapeHtml(new Date(a.starts_at).toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}))}</td>
+                <td>${a.participant_count}/${a.capacity}</td>
+                <td><span class="badge-status ${isCancelled ? 'badge-suspended' : 'badge-active'}">${escapeHtml(a.status)}</span></td>
+                <td>
+                  ${isCancelled ? '<span class="muted">cancelled</span>' : `<button type="button" class="btn btn-danger" style="padding:0.35rem 0.75rem; font-size:0.85rem" data-cancel-act="${a.id}">Cancel</button>`}
+                </td>
+              </tr>
+            `;
+          }).join("");
+        } catch (e) {
+          tbody.innerHTML = `<tr><td colspan="10" style="color:red; text-align:center">${escapeHtml(e.message)}</td></tr>`;
+        }
+      }
+
+      async function loadUsers() {
+        const q = $("#search-users").value.trim();
+        const tbody = $("#tbody-users");
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center">Loading...</td></tr>';
+        try {
+          const data = await api(`/api/admin/users?q=${encodeURIComponent(q)}`);
+          const users = data.users || [];
+          if (!users.length) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:1.5rem">No students found.</td></tr>';
+            return;
+          }
+          window._adminUsers = users;
+          tbody.innerHTML = users.map(u => {
+            const isSuspended = u.is_suspended;
+            return `
+              <tr>
+                <td>#${u.id}</td>
+                <td><strong>${escapeHtml(u.display_name)}</strong> ${u.is_demo ? '<span class="badge" style="font-size:0.7rem">Demo</span>' : ''}</td>
+                <td>${escapeHtml(u.email)}</td>
+                <td>${escapeHtml(u.badge_label || u.study_year_label || "—")}</td>
+                <td><span class="badge" style="background:${u.role === 'admin' ? 'var(--butter)' : 'var(--paper)'}">${escapeHtml(u.role)}</span></td>
+                <td><span class="badge-status ${isSuspended ? 'badge-suspended' : 'badge-active'}">${isSuspended ? 'Suspended' : 'Active'}</span></td>
+                <td>
+                  <button type="button" class="btn btn-butter" style="padding:0.35rem 0.65rem; font-size:0.85rem; margin-right:0.3rem" data-edit-user="${u.id}">Edit</button>
+                  ${u.role === 'admin' ? '<span class="muted" style="margin-left:0.3rem">admin</span>' : (
+                    isSuspended ?
+                      `<button type="button" class="btn btn-mint" style="padding:0.35rem 0.65rem; font-size:0.85rem" data-unsuspend-user="${u.id}">Reactivate</button>` :
+                      `<button type="button" class="btn btn-danger" style="padding:0.35rem 0.65rem; font-size:0.85rem" data-suspend-user="${u.id}">Suspend</button>`
+                  )}
+                </td>
+              </tr>
+            `;
+          }).join("");
+        } catch (e) {
+          tbody.innerHTML = `<tr><td colspan="7" style="color:red; text-align:center">${escapeHtml(e.message)}</td></tr>`;
+        }
+      }
+
+      async function loadReports() {
+        const status = $("#filter-reports-status").value;
+        const tbody = $("#tbody-reports");
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center">Loading...</td></tr>';
+        try {
+          const data = await api(`/api/admin/reports${status ? `?status=${encodeURIComponent(status)}` : ""}`);
+          const reports = data.reports || [];
+          if (!reports.length) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:1.5rem">No reports matching filter.</td></tr>';
+            return;
+          }
+          tbody.innerHTML = reports.map(r => {
+            const badgeClass = r.status === 'open' ? 'badge-open' : (r.status === 'reviewed' ? 'badge-reviewed' : 'badge-dismissed');
+            return `
+              <tr>
+                <td>#${r.id}</td>
+                <td>${escapeHtml(r.reporter_name || "Anonymous")}</td>
+                <td><strong>${escapeHtml(r.activity_title || "(Deleted quest)")}</strong></td>
+                <td>${escapeHtml(r.reason)}</td>
+                <td>${escapeHtml(new Date(r.created_at).toLocaleDateString())}</td>
+                <td><span class="badge-status ${badgeClass}">${escapeHtml(r.status)}</span></td>
+                <td style="white-space:nowrap">
+                  ${r.status === 'open' ? `
+                    <button type="button" class="btn btn-mint" style="padding:0.3rem 0.6rem; font-size:0.8rem" data-resolve-report="${r.id}" data-status="reviewed">Review</button>
+                    <button type="button" class="btn btn-ghost" style="padding:0.3rem 0.6rem; font-size:0.8rem" data-resolve-report="${r.id}" data-status="dismissed">Dismiss</button>
+                  ` : '<span class="muted">resolved</span>'}
+                </td>
+              </tr>
+            `;
+          }).join("");
+        } catch (e) {
+          tbody.innerHTML = `<tr><td colspan="7" style="color:red; text-align:center">${escapeHtml(e.message)}</td></tr>`;
+        }
+      }
+
+      // Event handlers
+      $$(".admin-tab-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          $$(".admin-tab-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          const tab = btn.dataset.tab;
+          $("#tab-activities").classList.toggle("hidden", tab !== "activities");
+          $("#tab-users").classList.toggle("hidden", tab !== "users");
+          $("#tab-reports").classList.toggle("hidden", tab !== "reports");
+          if (tab === "activities") loadActivities();
+          if (tab === "users") loadUsers();
+          if (tab === "reports") loadReports();
+        });
+      });
+
+      $("#btn-refresh-activities").addEventListener("click", loadActivities);
+      $("#search-activities").addEventListener("input", () => {
+        clearTimeout(window._actTimeout);
+        window._actTimeout = setTimeout(loadActivities, 300);
+      });
+
+      $("#btn-refresh-users").addEventListener("click", loadUsers);
+      $("#search-users").addEventListener("input", () => {
+        clearTimeout(window._userTimeout);
+        window._userTimeout = setTimeout(loadUsers, 300);
+      });
+
+      $("#btn-refresh-reports").addEventListener("click", loadReports);
+      $("#filter-reports-status").addEventListener("change", loadReports);
+
+      document.body.addEventListener("click", async (e) => {
+        const cancelBtn = e.target.closest("[data-cancel-act]");
+        if (cancelBtn) {
+          const id = cancelBtn.dataset.cancelAct;
+          if (confirm(`Are you sure you want to cancel quest #${id}?`)) {
+            try {
+              await api(`/api/admin/activities/${id}`, { method: "DELETE" });
+              toast("Quest cancelled", "warn");
+              loadActivities();
+              loadStats();
+            } catch (err) {
+              toast(err.message, "error");
+            }
+          }
+          return;
+        }
+
+        const suspBtn = e.target.closest("[data-suspend-user]");
+        if (suspBtn) {
+          const id = suspBtn.dataset.suspendUser;
+          try {
+            await api(`/api/admin/users/${id}/suspend`, { method: "POST" });
+            toast("User suspended", "warn");
+            loadUsers();
+            loadStats();
+          } catch (err) {
+            toast(err.message, "error");
+          }
+          return;
+        }
+
+        const unsuspBtn = e.target.closest("[data-unsuspend-user]");
+        if (unsuspBtn) {
+          const id = unsuspBtn.dataset.unsuspendUser;
+          try {
+            await api(`/api/admin/users/${id}/unsuspend`, { method: "POST" });
+            toast("User reactivated", "ok");
+            loadUsers();
+            loadStats();
+          } catch (err) {
+            toast(err.message, "error");
+          }
+          return;
+        }
+
+        const editBtn = e.target.closest("[data-edit-user]");
+        if (editBtn) {
+          const id = Number(editBtn.dataset.editUser);
+          const user = (window._adminUsers || []).find(u => u.id === id);
+          if (user) {
+            $("#eu-id").value = user.id;
+            $("#eu-name").value = user.display_name || "";
+            $("#eu-email").value = user.email || "";
+            $("#eu-role").value = user.role || "user";
+            $("#eu-status").value = user.is_suspended ? "1" : "0";
+            $("#eu-gender").value = user.gender || "prefer_not_to_say";
+            $("#eu-pref").value = user.connection_preference || "either";
+            $("#eu-vis").value = user.profile_visibility || "public";
+            $("#eu-bio").value = user.bio || "";
+            $("#edit-user-modal").classList.remove("hidden");
+          }
+          return;
+        }
+
+        const resolveBtn = e.target.closest("[data-resolve-report]");
+        if (resolveBtn) {
+          const id = resolveBtn.dataset.resolveReport;
+          const status = resolveBtn.dataset.status;
+          try {
+            await api(`/api/admin/reports/${id}`, {
+              method: "POST",
+              body: JSON.stringify({ status })
+            });
+            toast(`Report marked as ${status}`, "ok");
+            loadReports();
+            loadStats();
+          } catch (err) {
+            toast(err.message, "error");
+          }
+          return;
+        }
+      });
+
+      // Edit User Modal Handlers
+      $$("[data-close-edit-user]").forEach(el => {
+        el.addEventListener("click", () => {
+          $("#edit-user-modal").classList.add("hidden");
+        });
+      });
+
+      $("#edit-user-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const id = $("#eu-id").value;
+        const payload = {
+          display_name: $("#eu-name").value.trim(),
+          email: $("#eu-email").value.trim(),
+          role: $("#eu-role").value,
+          is_suspended: parseInt($("#eu-status").value, 10),
+          gender: $("#eu-gender").value,
+          connection_preference: $("#eu-pref").value,
+          profile_visibility: $("#eu-vis").value,
+          bio: $("#eu-bio").value.trim()
+        };
+        try {
+          await api(`/api/admin/users/${id}`, {
+            method: "PATCH",
+            body: JSON.stringify(payload)
+          });
+          toast("Student profile updated ✿", "ok");
+          $("#edit-user-modal").classList.add("hidden");
+          loadUsers();
+          loadStats();
+        } catch (err) {
+          toast(err.message, "error");
+        }
+      });
+
+      // 5-Stage Mass Reset Modal Handlers
+      function showResetStage(stage) {
+        for (let i = 1; i <= 5; i++) {
+          const el = $(`#reset-stage-${i}`);
+          if (el) el.classList.toggle("hidden", i !== stage);
+        }
+        $("#reset-stage-badge").textContent = `Warning ${stage} of 5`;
+        if (stage === 5) {
+          $("#input-confirm-reset").value = "";
+          const execBtn = $("#btn-execute-reset");
+          execBtn.disabled = true;
+          execBtn.style.opacity = "0.5";
+        }
+      }
+
+      $("#btn-open-mass-reset").addEventListener("click", () => {
+        showResetStage(1);
+        $("#mass-reset-modal").classList.remove("hidden");
+      });
+
+      $$("[data-close-reset]").forEach(el => {
+        el.addEventListener("click", () => {
+          $("#mass-reset-modal").classList.add("hidden");
+        });
+      });
+
+      $$("[data-advance-reset]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const nextStage = parseInt(btn.dataset.advanceReset, 10);
+          showResetStage(nextStage);
+        });
+      });
+
+      $("#input-confirm-reset").addEventListener("input", (e) => {
+        const val = e.target.value.trim();
+        const execBtn = $("#btn-execute-reset");
+        if (val === "RESET") {
+          execBtn.disabled = false;
+          execBtn.style.opacity = "1";
+        } else {
+          execBtn.disabled = true;
+          execBtn.style.opacity = "0.5";
+        }
+      });
+
+      $("#btn-execute-reset").addEventListener("click", async () => {
+        try {
+          await api("/api/admin/reset", {
+            method: "POST",
+            body: JSON.stringify({ confirmation: "RESET" })
+          });
+          toast("Database successfully restored to default demo state! 🎉", "ok");
+          $("#mass-reset-modal").classList.add("hidden");
+          loadStats();
+          loadActivities();
+          loadUsers();
+          loadReports();
+        } catch (err) {
+          toast(err.message, "error");
+        }
+      });
+
+      $("#admin-logout").addEventListener("click", async () => {
+        try {
+          await api("/api/auth/logout", { method: "POST" });
+        } catch (_) {}
+        window.location.href = "/";
+      });
+
+      loadStats();
+      loadActivities();
+    })();
+  </script>
+</body>
+</html>
+

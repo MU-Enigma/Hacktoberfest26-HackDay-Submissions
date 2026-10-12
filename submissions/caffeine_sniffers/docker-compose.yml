@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  web:
+    build: .
+    container_name: sidequest
+    ports:
+      - "5050:5050"
+    environment:
+      - PORT=5050
+      - UNIVERSITY_EMAIL_DOMAIN=mahindrauniversity.edu.in
+      - FLASK_SECRET_KEY=sidequest-hackathon-demo-secret
+      - FLASK_DEBUG=0
+    volumes:
+      - ./uploads:/app/uploads
+      - ./sidequest.db:/app/sidequest.db
+    restart: unless-stopped
+
