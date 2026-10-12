@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template_string
+from flask import Flask, request, render_template_string, make_response, redirect
 from datetime import datetime, timedelta
 import sqlite3
 import os
@@ -98,9 +98,35 @@ def dashboard():
     refresh_system_states(conn)
     machines = conn.execute("SELECT * FROM machines").fetchall()
     queue = conn.execute("SELECT * FROM queue WHERE status IN ('Waiting', 'Notified') ORDER BY joined_at ASC").fetchall()
+    
+    # Check if user has active session cookies stored
+    user_name = request.cookies.get('laundry_user_name')
+    user_phone = request.cookies.get('laundry_user_phone')
+    
+    my_active_machine = None
+    my_queue_status = None
+    
+    if user_name and user_phone:
+        my_active_machine = conn.execute(
+            "SELECT * FROM machines WHERE (current_user_name = ? AND current_user_phone = ?) OR (reserved_for_name = ? AND reserved_for_phone = ?)",
+            (user_name, user_phone, user_name, user_phone)
+        ).fetchone()
+        
+        my_queue_status = conn.execute(
+            "SELECT * FROM queue WHERE name = ? AND phone = ? AND status IN ('Waiting', 'Notified')",
+            (user_name, user_phone)
+        ).fetchone()
+
     conn.commit()
     conn.close()
-    return render_template_string(DASHBOARD_TEMPLATE, machines=machines, queue=queue)
+    return render_template_string(DASHBOARD_TEMPLATE, machines=machines, queue=queue, user_name=user_name, my_active_machine=my_active_machine, my_queue_status=my_queue_status)
+
+@app.route('/logout')
+def logout():
+    resp = make_response(redirect('/'))
+    resp.set_cookie('laundry_user_name', '', expires=0)
+    resp.set_cookie('laundry_user_phone', '', expires=0)
+    return resp
 
 @app.route('/reset-db')
 def reset_db():
@@ -130,10 +156,16 @@ def scan_qr(machine_id):
         conn.close()
         return "Machine not found", 404
         
+    # Pre-fill from cookies if available
+    cookie_name = request.cookies.get('laundry_user_name', '')
+    cookie_phone = request.cookies.get('laundry_user_phone', '')
+    
     message = None
+    resp = None
+
     if request.method == 'POST':
-        name = request.form.get('name')
-        phone = request.form.get('phone')
+        name = request.form.get('name').strip()
+        phone = request.form.get('phone').strip()
         action = request.form.get('action')
         now = datetime.now()
         
@@ -175,10 +207,17 @@ def scan_qr(machine_id):
             conn.commit()
             message = "✨ Clothes removed! Machine is squeaky clean and available."
 
+        # Set cookies to remember user across pages
+        resp = make_response(render_template_string(MACHINE_TEMPLATE, machine=conn.execute("SELECT * FROM machines WHERE id = ?", (machine_id,)).fetchone(), queue=conn.execute("SELECT * FROM queue WHERE status IN ('Waiting', 'Notified') ORDER BY joined_at ASC").fetchall(), message=message, default_name=name, default_phone=phone))
+        resp.set_cookie('laundry_user_name', name, max_age=60*60*24*30)
+        resp.set_cookie('laundry_user_phone', phone, max_age=60*60*24*30)
+        conn.close()
+        return resp
+
     machine = conn.execute("SELECT * FROM machines WHERE id = ?", (machine_id,)).fetchone()
     queue = conn.execute("SELECT * FROM queue WHERE status IN ('Waiting', 'Notified') ORDER BY joined_at ASC").fetchall()
     conn.close()
-    return render_template_string(MACHINE_TEMPLATE, machine=machine, queue=queue, message=message)
+    return render_template_string(MACHINE_TEMPLATE, machine=machine, queue=queue, message=message, default_name=cookie_name, default_phone=cookie_phone)
 
 DASHBOARD_TEMPLATE = """
 <!DOCTYPE html>
@@ -208,7 +247,7 @@ DASHBOARD_TEMPLATE = """
     </style>
 </head>
 <body class="bg-gradient-to-tr from-sky-200 via-cyan-100 to-indigo-100 text-slate-800 min-h-screen p-4 sm:p-8 relative overflow-x-hidden">
-    <!-- Extra bubbly background elements -->
+    <!-- Bubbly background elements -->
     <div class="bubble w-8 h-8 top-12 left-8" style="animation-delay: 0s;"></div>
     <div class="bubble w-12 h-12 top-32 right-16" style="animation-delay: 1.2s;"></div>
     <div class="bubble w-6 h-6 top-64 left-1/3" style="animation-delay: 2.5s;"></div>
@@ -224,7 +263,34 @@ DASHBOARD_TEMPLATE = """
                 🧼 Washing MUchine Live
             </h1>
             <p class="text-sm text-sky-800 font-semibold mt-1">Real-time Laundry Hub • Auto-refreshes every 30s</p>
+            
+            {% if user_name %}
+            <div class="mt-4 inline-flex items-center gap-2 bg-white/80 backdrop-blur px-4 py-2 rounded-2xl shadow-sm border border-sky-200 text-xs">
+                <span>👋 Welcome back, <strong>{{user_name}}</strong>!</span>
+                <a href="/logout" class="text-rose-600 font-bold hover:underline ml-2">Switch User</a>
+            </div>
+            {% endif %}
         </header>
+
+        {% if my_active_machine or my_queue_status %}
+        <div class="bg-gradient-to-r from-sky-500 to-cyan-600 text-white rounded-3xl p-5 shadow-lg mb-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+                <span class="bg-white/20 text-xs font-black px-2.5 py-1 rounded-full uppercase tracking-wider">Your Active Status</span>
+                <h3 class="text-lg font-extrabold mt-2">
+                    {% if my_active_machine %}
+                        🧺 Using/Reserved: {{my_active_machine.name}} ({{my_active_machine.status}})
+                    {% elif my_queue_status %}
+                        ⏳ Waiting in Virtual Queue
+                    {% endif %}
+                </h3>
+            </div>
+            {% if my_active_machine %}
+                <a href="/machine/{{my_active_machine.id}}" class="bg-white text-sky-900 font-extrabold text-xs px-5 py-3 rounded-xl shadow hover:bg-sky-50 transition">
+                    Manage Machine ➔
+                </a>
+            {% endif %}
+        </div>
+        {% endif %}
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
             {% for m in machines %}
@@ -359,12 +425,12 @@ MACHINE_TEMPLATE = """
             <form method="POST" class="space-y-3">
                 <div>
                     <label class="block text-xs font-bold text-sky-800 uppercase tracking-wider mb-1">Your Name</label>
-                    <input type="text" name="name" placeholder="e.g. Alex Smith" required class="w-full px-3.5 py-2.5 bg-white border border-sky-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm">
+                    <input type="text" name="name" value="{{ default_name }}" placeholder="e.g. Alex Smith" required class="w-full px-3.5 py-2.5 bg-white border border-sky-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm">
                 </div>
                 
                 <div>
                     <label class="block text-xs font-bold text-sky-800 uppercase tracking-wider mb-1">Phone Number</label>
-                    <input type="text" name="phone" placeholder="e.g. 9876543210" required class="w-full px-3.5 py-2.5 bg-white border border-sky-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm">
+                    <input type="text" name="phone" value="{{ default_phone }}" placeholder="e.g. 9876543210" required class="w-full px-3.5 py-2.5 bg-white border border-sky-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm">
                 </div>
 
                 <hr class="border-sky-200/60 my-2">
@@ -385,7 +451,7 @@ MACHINE_TEMPLATE = """
                     </button>
 
                     {% if machine.status == 'Idle' %}
-                        <button type="submit" name="action" value="clear" class="w-full py-3 bg-rose-500 hover:bg-rose-600 text-white font-black rounded-xl text-sm shadow-md transition transform hover:-translate-y-0.5">
+                        <button type="submit" name="action" value="clear" class="w-full py-3 bg-rose-500 hover:bg-rose-600 text-white font-black rounded-xl text-sm shadow-md transition transform hover: -translate-y-0.5">
                             ✨ Emptied / Ready for Next Load
                         </button>
                     {% endif %}
