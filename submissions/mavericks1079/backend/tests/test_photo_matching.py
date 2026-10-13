@@ -79,7 +79,7 @@ class TestUploadEmbeddings:
 
 
 # ---------- Matching with photos ----------
-def _mk_item(token, type_, title, image_paths, color="red", location="Central Library"):
+def _mk_item(token, type_, title, image_paths, color="red", location="Library"):
     r = requests.post(f"{BASE}/items", headers=_hdr(token), json={
         "type": type_, "title": title,
         "description": "a small red object seen on a table in the library",
@@ -168,7 +168,7 @@ class TestDuplicatesWithImages:
         r = requests.post(f"{BASE}/items/check-duplicates", headers=_hdr(alice["token"]), json={
             "type": "found", "title": "Earbuds in white charging case",
             "description": "white earbuds inside a small white case",
-            "category": "electronics", "color": "white", "location": "Library Reading Room",
+            "category": "electronics", "color": "white", "location": "Centre for Sustainability",
             "image_paths": [up.json()["path"]],
         })
         assert r.status_code == 200
@@ -182,7 +182,7 @@ class TestWatchlistImage:
         assert ref.status_code == 200
         wl = requests.post(f"{BASE}/watchlists", headers=_hdr(alice["token"]), json={
             "name": f"TEST wl img {uuid.uuid4().hex[:4]}", "keywords": "yellow widget",
-            "category": "other", "locations": ["Central Library"], "threshold": 30,
+            "category": "other", "locations": ["Library"], "threshold": 30,
             "item_type": "found", "active": True, "reference_image": ref.json()["path"],
         })
         assert wl.status_code == 200, wl.text

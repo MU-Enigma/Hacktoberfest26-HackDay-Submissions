@@ -25,7 +25,7 @@ const PAGES = {
   safety: {
     title: "Safety guidelines",
     sections: [
-      ["Meet in safe places", "Use staffed, public campus locations such as the Campus Security Office, the Library front desk or the Admin Building. Avoid isolated spots and late hours."],
+      ["Meet in safe places", "Use staffed, public campus locations such as the Library front desk, the Infra Office or the Health Care Centre. Avoid isolated spots and late hours."],
       ["Verify ownership", "Ask for details that only the owner would know. Do not hand over an item just because someone knows its name or colour."],
       ["High-value items", "For phones, laptops, ID cards, wallets and jewellery we recommend handing the item to a campus office and verifying there."],
       ["Protect your privacy", "Keep conversations in Back2U. Never share passwords, OTPs or bank details. Report anyone who pressures you."],

@@ -140,7 +140,7 @@ class TestItemsML:
         tok = reg["token"]
         r = requests.post(f"{BASE}/items", headers=_hdr(tok), json={
             "type": "lost", "title": "Test lost book", "description": "a blue novel",
-            "category": "books", "location": "Central Library",
+            "category": "books", "location": "Library",
             "occurred_at": "2026-01-05T10:00:00+00:00"})
         assert r.status_code == 403
         # Now ack and retry
@@ -148,7 +148,7 @@ class TestItemsML:
         assert ack.status_code == 200
         r2 = requests.post(f"{BASE}/items", headers=_hdr(tok), json={
             "type": "lost", "title": "TEST lost book", "description": "a blue novel",
-            "category": "books", "location": "Central Library",
+            "category": "books", "location": "Library",
             "occurred_at": "2026-01-05T10:00:00+00:00"})
         assert r2.status_code == 200, r2.text
         assert "secure_collection_location" not in r2.json() or r2.json().get("secure_collection_location") in ("", None)
@@ -157,7 +157,7 @@ class TestItemsML:
         r = requests.post(f"{BASE}/items/check-duplicates", headers=_hdr(alice["token"]), json={
             "type": "found", "title": "Earbuds in white charging case",
             "description": "white earbuds inside a small white case",
-            "category": "electronics", "color": "white", "location": "Library Reading Room"})
+            "category": "electronics", "color": "white", "location": "Centre for Sustainability"})
         assert r.status_code == 200
         # Not strict - seed may or may not match depending on state
         data = r.json()
@@ -225,7 +225,7 @@ def claim_flow(alice, bob):
     item = requests.post(f"{BASE}/items", headers=_hdr(bob["token"]), json={
         "type": "found", "title": "TEST Earbuds in white case",
         "description": "white wireless earbuds in a charging case, left in library",
-        "category": "electronics", "color": "white", "location": "Library Reading Room",
+        "category": "electronics", "color": "white", "location": "Centre for Sustainability",
         "occurred_at": "2026-01-06T10:00:00+00:00",
         "private_clues": "blue star sticker inside lid; chipped left bud",
         "secure_collection_location": "Campus Security Office", "holder": "office",
@@ -283,7 +283,7 @@ class TestClaims:
         item = requests.post(f"{BASE}/items", headers=_hdr(bob["token"]), json={
             "type": "found", "title": "TEST decoy wallet",
             "description": "brown leather wallet with cards inside",
-            "category": "wallets", "color": "brown", "location": "Main Cafeteria",
+            "category": "wallets", "color": "brown", "location": "Dining-1",
             "occurred_at": "2026-01-06T10:00:00+00:00",
             "private_clues": "driver license id 1234", "secure_collection_location": "Campus Security Office",
             "holder": "office",
@@ -318,7 +318,7 @@ class TestHandover:
         it = requests.post(f"{BASE}/items", headers=_hdr(bob["token"]), json={
             "type": "found", "title": "TEST QR flow earbuds",
             "description": "white wireless earbuds for qr handover test",
-            "category": "electronics", "color": "white", "location": "Library Reading Room",
+            "category": "electronics", "color": "white", "location": "Centre for Sustainability",
             "occurred_at": "2026-01-07T10:00:00+00:00",
             "private_clues": "blue star sticker inside lid",
             "secure_collection_location": "Campus Security Office", "holder": "office",
@@ -393,11 +393,11 @@ class TestWatchlist:
         tok = alice["token"]
         wl = requests.post(f"{BASE}/watchlists", headers=_hdr(tok), json={
             "name": "TEST wl", "keywords": "earbuds", "category": "electronics",
-            "locations": ["Central Library"], "threshold": 60, "item_type": "found", "active": True}).json()
+            "locations": ["Library"], "threshold": 60, "item_type": "found", "active": True}).json()
         assert "id" in wl
         wl2 = requests.put(f"{BASE}/watchlists/{wl['id']}", headers=_hdr(tok), json={
             "name": "TEST wl2", "keywords": "earbuds", "category": "electronics",
-            "locations": ["Central Library"], "threshold": 70, "item_type": "found", "active": False}).json()
+            "locations": ["Library"], "threshold": 70, "item_type": "found", "active": False}).json()
         assert wl2["active"] is False
         d = requests.delete(f"{BASE}/watchlists/{wl['id']}", headers=_hdr(tok))
         assert d.status_code == 200
@@ -460,7 +460,7 @@ class TestAdmin:
         # Suspended user cannot create items
         it = requests.post(f"{BASE}/items", headers=_hdr(tok), json={
             "type": "lost", "title": "TEST x", "description": "aaaaa",
-            "category": "books", "location": "Central Library",
+            "category": "books", "location": "Library",
             "occurred_at": "2026-01-05T10:00:00+00:00"})
         assert it.status_code == 403
         # Suspended user cannot upload

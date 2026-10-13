@@ -23,7 +23,7 @@ def test_categorizer_uncertain_fallback():
 
 
 def test_match_score_ranks_similar_higher():
-    lost = {"title": "white earbuds case", "description": "white wireless earbuds", "category": "electronics", "color": "white", "location": "Central Library", "occurred_at": "2026-01-01T10:00:00+00:00"}
+    lost = {"title": "white earbuds case", "description": "white wireless earbuds", "category": "electronics", "color": "white", "location": "Library", "occurred_at": "2026-01-01T10:00:00+00:00"}
     good = {**lost, "title": "earbuds in charging case", "occurred_at": "2026-01-01T15:00:00+00:00"}
     bad = {"title": "green bottle", "description": "steel bottle", "category": "bottles", "color": "green", "location": "Gymnasium", "occurred_at": "2025-12-01T10:00:00+00:00"}
     assert ml.score_pair(lost, good, {})["score"] > ml.score_pair(lost, bad, {})["score"]

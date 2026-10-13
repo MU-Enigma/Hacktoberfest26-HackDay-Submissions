@@ -36,11 +36,57 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Locations taken from the Mahindra University campus map: (name, zone, is_safe_point)
 DEFAULT_LOCATIONS = [
-    ("Central Library", "Academic Core", True), ("Library Reading Room", "Academic Core", False), ("Lecture Hall Complex", "Academic Core", False),
-    ("Computer Science Block", "Academic Core", False), ("Main Cafeteria", "Student Life", False), ("Student Activity Centre", "Student Life", False),
-    ("Sports Complex", "Sports", False), ("Gymnasium", "Sports", False), ("Boys Hostel A", "Residential", False), ("Girls Hostel B", "Residential", False),
-    ("Main Gate", "Perimeter", False), ("Parking Lot", "Perimeter", False), ("Campus Security Office", "Admin", True), ("Admin Building", "Admin", True),
+    # Vineet Nayyar Academic Block
+    ("Library", "Vineet Nayyar Academic Block", True),
+    ("Centre for Sustainability", "Vineet Nayyar Academic Block", False),
+    ("School of Design Innovation", "Vineet Nayyar Academic Block", False),
+    ("School of Hospitality Management", "Vineet Nayyar Academic Block", False),
+    ("Culinary", "Vineet Nayyar Academic Block", False),
+    ("Aero Space", "Vineet Nayyar Academic Block", False),
+    # Academic Blocks
+    ("Classrooms", "Academic Blocks", False),
+    ("Centre for Executive Education", "Academic Blocks", False),
+    ("Centre for Life Sciences", "Academic Blocks", False),
+    ("AIC Mahindra", "Academic Blocks", False),
+    ("Little Scholars Academy", "Academic Blocks", False),
+    ("Indra Mahindra School of Education", "Academic Blocks", False),
+    ("School of Management", "Academic Blocks", False),
+    ("School of Media & Digital Communication", "Academic Blocks", False),
+    # Engineering
+    ("Ecole Centrale School of Engineering", "Engineering", False),
+    ("CAIR Labs", "Engineering", False),
+    ("Fluid Mechanics Robotics", "Engineering", False),
+    ("Workshops", "Engineering", False),
+    # Hostels
+    ("Hostel 1", "Hostels", False), ("Hostel 2", "Hostels", False), ("Hostel 3", "Hostels", False),
+    ("Hostel 4A", "Hostels", False), ("Hostel 4B", "Hostels", False),
+    ("Studio Apartment", "Hostels", False), ("Evolve Center", "Hostels", False),
+    ("Shivalik Hostel", "Hostels-5", False), ("Ajantha Hostel", "Hostels-5", False), ("Vindhya Hostel", "Hostels-5", False),
+    ("Himalaya Hostel", "Hostels-5", False), ("Aravali Hostel", "Hostels-5", False), ("Satpura Hostel", "Hostels-5", False),
+    ("Nilgiri Hostel", "Hostels-5", False), ("Kailash Hostel", "Hostels-5", False),
+    # Residential
+    ("Guest House", "Residential", False), ("Residential Bungalows", "Residential", False),
+    # Dining & amenities
+    ("Dining-1", "Dining & Amenities", False), ("Dining-2", "Dining & Amenities", False), ("Dining-3", "Dining & Amenities", False),
+    ("Cafe", "Dining & Amenities", False), ("Shopping Complex", "Dining & Amenities", False),
+    ("Health Care Centre", "Dining & Amenities", True),
+    # Sports
+    ("Soccer Field", "Sports", False), ("Shuttle Court", "Sports", False), ("Swimming Pool", "Sports", False),
+    # Convention & NCC
+    ("Convention Centre", "Convention & NCC", False), ("NCC Office", "Convention & NCC", False),
+    # Parking & utilities
+    ("MLCP", "Parking & Utilities", False),
+    ("Parking (Academic Blocks)", "Parking & Utilities", False), ("Parking (Soccer Field)", "Parking & Utilities", False),
+    ("Parking (Convention Centre)", "Parking & Utilities", False),
+    ("Infra Office", "Parking & Utilities", True), ("Power House-1", "Parking & Utilities", False),
+]
+# Old placeholder locations that get removed on startup
+LEGACY_LOCATIONS = [
+    "Central Library", "Library Reading Room", "Lecture Hall Complex", "Computer Science Block", "Main Cafeteria",
+    "Student Activity Centre", "Sports Complex", "Gymnasium", "Boys Hostel A", "Girls Hostel B", "Main Gate",
+    "Parking Lot", "Campus Security Office", "Admin Building",
 ]
 
 
@@ -73,8 +119,12 @@ async def startup():
     await db.audit_logs.create_index("created_at")
     await db.login_attempts.create_index("identifier")
     await db.locations.create_index("name", unique=True)
-    if await db.locations.count_documents({}) == 0:
-        await db.locations.insert_many([{"id": new_id(), "name": n, "zone": z, "is_safe_point": s, "created_at": iso()} for n, z, s in DEFAULT_LOCATIONS])
+    # Keep the locations list in sync with the campus map (removes legacy placeholders, adds/updates map locations;
+    # locations added manually by an admin are left untouched).
+    await db.locations.delete_many({"name": {"$in": LEGACY_LOCATIONS}})
+    for n, z, s in DEFAULT_LOCATIONS:
+        await db.locations.update_one({"name": n}, {"$set": {"zone": z, "is_safe_point": s},
+                                      "$setOnInsert": {"id": new_id(), "name": n, "created_at": iso()}}, upsert=True)
     await ensure_user(os.environ["ADMIN_EMAIL"].lower(), os.environ["ADMIN_PASSWORD"], "Back2U Admin", "admin")
     demo_pw = os.environ["DEMO_PASSWORD"]
     for email, name in (("alice@campus.edu", "Alice Sharma"), ("bob@campus.edu", "Bob Mathew"), ("carol@campus.edu", "Carol Dsouza")):

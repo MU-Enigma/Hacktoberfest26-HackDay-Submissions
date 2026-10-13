@@ -144,7 +144,7 @@ export default function ReportItem({ mode }) {
             <div className="grid sm:grid-cols-2 gap-4">
               <Field label="Item is currently with"><SelectField value={f.holder} onChange={set("holder")} options={[["office", "An authorized campus office"], ["finder", "Me (the finder)"]]} testId="report-holder-select" /></Field>
               <Field label="Expected collection window" htmlFor="window"><Input id="window" value={f.collection_window} onChange={set("collection_window")} placeholder="e.g. Weekdays 10-17" data-testid="report-collection-window-input" /></Field>
-              <Field label="Secure collection location (private)" htmlFor="secure" hint="Only shown to the approved claimant."><Input id="secure" value={f.secure_collection_location} onChange={set("secure_collection_location")} placeholder="e.g. Campus Security Office, counter 2" data-testid="report-secure-location-input" /><Err k="secure_collection_location" /></Field>
+              <Field label="Secure collection location (private)" htmlFor="secure" hint="Only shown to the approved claimant."><Input id="secure" value={f.secure_collection_location} onChange={set("secure_collection_location")} placeholder="e.g. Infra Office, front desk" data-testid="report-secure-location-input" /><Err k="secure_collection_location" /></Field>
               <Field label="Notes for the owner (optional)" htmlFor="notes"><Input id="notes" value={f.notes_for_owner} onChange={set("notes_for_owner")} data-testid="report-notes-input" /></Field>
             </div>
           )}
