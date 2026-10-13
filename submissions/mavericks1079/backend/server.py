@@ -124,7 +124,7 @@ async def startup():
     await db.locations.delete_many({"name": {"$in": LEGACY_LOCATIONS}})
     for n, z, s in DEFAULT_LOCATIONS:
         await db.locations.update_one({"name": n}, {"$set": {"zone": z, "is_safe_point": s},
-                                      "$setOnInsert": {"id": new_id(), "name": n, "created_at": iso()}}, upsert=True)
+                                      "$setOnInsert": {"id": new_id(), "created_at": iso()}}, upsert=True)
     await ensure_user(os.environ["ADMIN_EMAIL"].lower(), os.environ["ADMIN_PASSWORD"], "Back2U Admin", "admin")
     demo_pw = os.environ["DEMO_PASSWORD"]
     for email, name in (("alice@campus.edu", "Alice Sharma"), ("bob@campus.edu", "Bob Mathew"), ("carol@campus.edu", "Carol Dsouza")):
@@ -140,3 +140,4 @@ async def startup():
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
+
