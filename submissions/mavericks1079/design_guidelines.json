@@ -1,0 +1,76 @@
+{
+  "project_name": "Back2U - Intelligent Campus Lost & Found Platform",
+  "theme": "Clean University-Tech Aesthetic (Light Theme)",
+  "archetype": "Architectural Precision & Soft Academic Slate",
+  "palette": {
+    "background": "hsl(210, 20%, 98%)",
+    "foreground": "hsl(222.2, 84%, 4.9%)",
+    "card": "hsl(0, 0%, 100%)",
+    "card_foreground": "hsl(222.2, 84%, 4.9%)",
+    "primary": "hsl(221.2, 83.2%, 53.3%)",
+    "primary_hover": "hsl(221.2, 83.2%, 45%)",
+    "primary_foreground": "hsl(210, 40%, 98%)",
+    "secondary": "hsl(210, 40%, 96.1%)",
+    "secondary_foreground": "hsl(222.2, 47.4%, 11.2%)",
+    "muted": "hsl(210, 40%, 96.1%)",
+    "muted_foreground": "hsl(215.4, 16.3%, 44%)",
+    "accent_indigo": "hsl(238.7, 83.5%, 66.7%)",
+    "accent_emerald": "hsl(158.1, 64.4%, 41.6%)",
+    "accent_amber": "hsl(37.7, 92.1%, 50.2%)",
+    "destructive": "hsl(0, 84.2%, 60.2%)",
+    "border": "hsl(214.3, 31.8%, 91.4%)",
+    "input": "hsl(214.3, 31.8%, 91.4%)",
+    "ring": "hsl(221.2, 83.2%, 53.3%)"
+  },
+  "typography": {
+    "font_family_main": "Plus Jakarta Sans, sans-serif",
+    "font_family_mono": "JetBrains Mono, monospace",
+    "heading_h1": "text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 leading-none",
+    "heading_h2": "text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-slate-900",
+    "heading_h3": "text-xl sm:text-2xl font-semibold tracking-tight text-slate-800",
+    "heading_h4": "text-lg sm:text-xl font-medium text-slate-800",
+    "body_base": "text-base font-normal text-slate-600 leading-relaxed",
+    "body_sm": "text-sm font-normal text-slate-500",
+    "label_overline": "text-xs font-semibold uppercase tracking-widest text-indigo-600"
+  },
+  "status_badges": {
+    "LOST": "bg-amber-100 text-amber-800 border border-amber-200 font-semibold px-2.5 py-1 rounded-full text-xs inline-flex items-center gap-1.5",
+    "FOUND": "bg-emerald-100 text-emerald-800 border border-emerald-200 font-semibold px-2.5 py-1 rounded-full text-xs inline-flex items-center gap-1.5",
+    "MATCH_FOUND": "bg-indigo-100 text-indigo-800 border border-indigo-200 font-semibold px-2.5 py-1 rounded-full text-xs inline-flex items-center gap-1.5",
+    "CLAIM_PENDING": "bg-blue-100 text-blue-800 border border-blue-200 font-semibold px-2.5 py-1 rounded-full text-xs inline-flex items-center gap-1.5",
+    "VERIFICATION_IN_PROGRESS": "bg-purple-100 text-purple-800 border border-purple-200 font-semibold px-2.5 py-1 rounded-full text-xs inline-flex items-center gap-1.5",
+    "READY_FOR_HANDOVER": "bg-teal-100 text-teal-800 border border-teal-200 font-semibold px-2.5 py-1 rounded-full text-xs inline-flex items-center gap-1.5",
+    "RETURNED": "bg-green-100 text-green-800 border border-green-200 font-semibold px-2.5 py-1 rounded-full text-xs inline-flex items-center gap-1.5",
+    "CLOSED": "bg-slate-100 text-slate-600 border border-slate-200 font-semibold px-2.5 py-1 rounded-full text-xs inline-flex items-center gap-1.5"
+  },
+  "layout_and_spacing": {
+    "container_padding": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
+    "card_padding": "p-6 sm:p-8",
+    "card_border_radius": "rounded-2xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-200",
+    "section_gap": "py-12 sm:py-16 lg:py-20",
+    "hero_overlay": "bg-slate-900/40 backdrop-blur-[2px]"
+  },
+  "image_urls": {
+    "hero_background": "https://images.unsplash.com/photo-1554911940-05efc1892bc5?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjY2NjV8MHwxfHNlYXJjaHszfHx1bml2ZXJzaXR5JTIwY2FtcHVzJTIwbGlicmFyeSUyMHN0dWRlbnRzJTIwYmFja3BhY2slMjBsYXB0b3B8ZW58MHx8fHwxNzkxODE3ODIxfDA&ixlib=rb-4.1.0&q=85",
+    "campus_students_study": "https://images.unsplash.com/photo-1775702764414-ce4c66079a70?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjY2NjV8MHwxfHNlYXJjaHwyfHx1bml2ZXJzaXR5JTIwY2FtcHVzJTIwbGlicmFyeSUyMHN0dWRlbnRzJTIwYmFja3BhY2slMjBsYXB0b3B8ZW58MHx8fHwxNzkxODE3ODIxfDA&ixlib=rb-4.1.0&q=85",
+    "items_flatlay": "https://images.unsplash.com/photo-1528921581519-52b9d779df2b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MTJ8MHwxfHNlYXJjaHxfhYmFja3BhY2slMjBsYXB0b3B8ZW58MHx8fHwxNzkxODE3ODI5fDA&ixlib=rb-4.1.0&q=85",
+    "laptop_workspace": "https://images.unsplash.com/photo-1541240290619-3f2fad86473d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MTJ8MHwxfHNlYXJjaHwyfHxiYWNrcGFjayUyMGxhcHRvcCUyMGtleXMlMjBoZWFkcGhvbmVzJTIwbG3zdCUyMGl0ZW18ZW58MHx8fHwxNzkxODE3ODI5fDA&ixlib=rb-4.1.0&q=85",
+    "backpack": "https://images.unsplash.com/photo-1568247067952-eab2ce84a349?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MTJ8MHwxfHNlYXJjaHwzfHxiYWNrcGFjayUyMGxhcHRvcCUyMGtleXMlMjBoZWFkcGhvbmVzJTIwbG9zdCUyMGl0ZW18ZW58MHx8fHwxNzkxODE3ODI5fDA&ixlib=rb-4.1.0&q=85"
+  },
+  "component_guidelines": {
+    "navbar": "Sticky header with glassmorphism `backdrop-blur-md bg-white/80 border-b border-slate-200/80 z-50`. Includes Brand Logo, Home, Browse Items, Community Feed, My Reports, Watchlist, Notifications dropdown badge, Profile dropdown, and CTA button. Desktop nav items must be clearly visible.",
+    "hero": "Prominent H1 'Lost something? Let's bring it back to you.', dual primary CTAs: 'I LOST IT' (Solid Indigo with Alert Circle icon) and 'I FOUND IT' (Emerald / Teal gradient or solid button with Search/Plus icon), integrated quick search bar with location and category dropdown filters, background image with maximum 40% overlay.",
+    "forms": "Step-by-step report forms for Lost and Found items. Image upload preview with ML category prediction badge (e.g. 'Predicted: Tech / Headphones (89% confidence) - Click to edit'), private clues fields (for verification), duplicate warning modal when high similarity detected.",
+    "claim_and_handover": "Claim verification workflow modal/page asking private questions. Match score banner (0-100% score dial with explanation bullets). QR code generator for two-party confirmation during physical handover with digital receipt generated upon mutual scan.",
+    "admin_dashboard": "Clean multi-tab interface: Moderation Reports, Claims Review, Suspended Users, Audit Log, Campus Hotspots/Locations, and System Statistics with Recharts visuals.",
+    "footer": "Simple, clean academic footer with navigation sections: Help, Responsible Use Policy, Safety Guidelines, Privacy Policy, About, and copyright statement."
+  },
+  "general_ui_ux_rules": [
+    "NO EMOJIS as UI icons - strictly use lucide-react vector icons.",
+    "All interactive and key informational elements MUST include a data-testid attribute in kebab-case (e.g. data-testid='submit-lost-report-button').",
+    "Header must NEVER be pure transparent over content - use glassmorphism with blur and background opacity.",
+    "Mandatory Responsible Use Policy checkbox in Registration/Login flows and item report forms.",
+    "Hover states must explicitly set text and background colors for optimal contrast.",
+    "Sonner library used for toasts (located in components/ui/sonner.jsx or via sonner package)."
+  ]
+}

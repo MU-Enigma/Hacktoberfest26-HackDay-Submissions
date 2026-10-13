@@ -1,0 +1,13 @@
+[build]
+  command = "yarn build"
+  publish = "build"
+
+[build.environment]
+  NODE_VERSION = "20"
+  CI = "false"
+
+# React Router: send every route to index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

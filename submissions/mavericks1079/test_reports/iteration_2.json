@@ -1,0 +1,32 @@
+{
+  "summary": "Focused photo-matching regression on Back2U. Added /app/backend/tests/test_photo_matching.py (9 tests) covering upload with embedding persistence, bad content-type (415), corrupt image bytes (422), >5MB (413), image-weighted matching (both-photo breakdown + image=0.2 weight and others scaled * 0.8 to sum=1.0), reason text 'Photos look visually similar (not proof of ownership)', text-only path (no 'image' key when one side has no photo), accuracy drop when the found-side photo is swapped from a red image to a blue image (image sim drops and overall score decreases), /items/check-duplicates accepts image_paths, watchlist with reference_image triggers notification on a visually similar found item, and seed regression that alice's lost 'White wireless earbuds case' still matches bob's found earbuds with high score. All 9 backend tests pass (one transient 500 was observed from the Emergent object store on a single POST /api/uploads and vanished on retry — not a Back2U bug). Frontend smoke on alice's item page confirmed score 93, emerald Photo similarity factor bar at 100%, 'Photos look visually similar (not proof of ownership)' reason line, and the MobileNetV2 disclaimer in the Potential matches panel.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "POST /api/uploads", "issue": "Occasional 500 bubbling up from upstream object store (integrations.emergentagent.com returned 500 for one PUT). Resolved on retry — recommend wrapping put_object with 1 retry + mapping upstream 5xx to a 502 for clearer client semantics."}
+    ]
+  },
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": [
+    "/app/backend/tests/test_photo_matching.py",
+    "/app/test_reports/pytest/photo_matching.xml"
+  ],
+  "action_items": [
+    "(Optional) Add retry/backoff around put_object in routes_items.upload to absorb transient 5xx from the object store"
+  ],
+  "critical_code_review_comments": [
+    "image_ml._session is loaded at import time on the request event loop thread; embed_image is correctly offloaded via run_in_executor, good.",
+    "ml.score_pair recomputes default MATCH_WEIGHTS dict per call — fine, but weights={k: v*(1-IMAGE_WEIGHT) ...} assumes the sum of MATCH_WEIGHTS is exactly 1.0 (it is: 0.35+0.2+0.15+0.15+0.15=1.0). If weights are ever edited to != 1.0 the image breakdown math silently drifts; consider asserting sum==1 at import.",
+    "routes_items.attach_images reads db.files per set of paths — N+1-safe (one $in query). OK.",
+    "backfill_image_embeddings recomputes ALL lost-item matches after any embedding changes which could be expensive; acceptable for current scale.",
+    "image_ml.image_similarity returns None when either side has empty embedding/histogram — handled by best_similarity, but if a db.files record was partially written (embedding present but histogram missing) the np.minimum call would raise; consider defensive length check."
+  ],
+  "updated_files": ["/app/backend/tests/test_photo_matching.py"],
+  "success_rate": {"backend": "100% (9/9 photo-matching) + prior 39/39 regression intact", "frontend": "100% on the targeted MatchesPanel photo-similarity flow"},
+  "test_credentials": "Admin richa.kshama@gmail.com / Back2U@Admin26 and demo students alice|bob|carol@campus.edu / Demo@1234 (POST /api/auth/demo-login works) all verified.",
+  "seed_data_creation": "Created only TEST_ prefixed items/watchlists owned by alice & bob to exercise image-matched pairs; one TEST_ watchlist with reference_image was created and then deleted by the test. No seed data mutated. Several solid-colour PNG uploads were stored in db.files under alice/bob's uploads paths.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Run: `python -m pytest backend/tests/test_photo_matching.py -v --tb=short -o addopts=''` (pytest.ini forces -n 2 which the suite is not safe under, so override). Full regression also at backend/tests/test_back2u_e2e.py. The seed alice earbuds <-> bob earbuds match now carries 'image' in breakdown and weights with image_weight=0.2. If a POST /api/uploads returns 500 intermittently it's upstream object store, retry once before failing.",
+  "rca of the issue": "No functional defects. Single flaky 500 came from external emergent object store, not Back2U code — upstream PUT to integrations.emergentagent.com/objstore returned 500 and Back2U propagates it. Mitigation: add a 1x retry around put_object or map upstream 5xx to 502. The transient did not reproduce on retry."
+}
