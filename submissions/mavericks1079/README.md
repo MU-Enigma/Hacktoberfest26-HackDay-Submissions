@@ -92,6 +92,43 @@ Moderate reports, handle misuse reports and appeals, suspend or ban users, manag
 
 **Optional sample data:** to fill the app with sample reports, run `python seed.py` in `backend/` with the same `.env` values as the server. This is not needed to try the app.
 
+## Screenshots
+
+### Home page
+![Home page](screenshots/01-home.png)
+
+The landing page explains the idea in one line and gives two big actions: **I LOST IT** and **I FOUND IT**. A search bar lets anyone look for items straight away, and the "Verified handovers only" badge points to the two-party QR confirmation that protects owners.
+
+### Recently reported items
+![Recently reported items](screenshots/02-recently-reported.png)
+
+Fresh reports appear as cards with a **LOST** or **FOUND** label, the category, the location, how long ago it was reported, and a live status such as **MATCH FOUND** once the system has paired a lost and a found report.
+
+### Browse and filter
+![Browse and filters](screenshots/03-browse-and-filters.png)
+
+The Browse page lists every report. Users can search by name, description, category or location, and narrow the list by type (lost or found), category, location, status and sort order. The **Search by photo** button is next to the search bar.
+
+### Search by photo: strong match
+![Photo search with a strong match](screenshots/04-photo-search-strong-match.png)
+
+A user uploads a photo of an item and the app compares it with photographed reports using an image model. Here a photo of keys finds the matching report at **98% alike**. The page reminds the user that the photo is not saved and that looking alike is never proof of ownership.
+
+### Search by photo: weak match
+![Photo search with weak matches](screenshots/05-photo-search-weak-match.png)
+
+When nothing is close, the app shows the nearest results with their low scores (here **31% alike**) and offers **I lost this** and **I found this** buttons to start a new report with the photo attached. The photo is only saved if the user chooses one of them.
+
+### Report form with ML suggestions
+![Report form with ML suggestions](screenshots/06-report-form-ml-suggestions.png)
+
+When a photo is added, the app suggests a category and colours from it. As the user types a title, a text model (TF-IDF with logistic regression) suggests a category with a confidence score and shows the next most likely categories. Everything can be changed by the user. The last-seen location is picked from the Mahindra University campus locations.
+
+### Mobile view
+![Mobile view](screenshots/07-mobile-view.png)
+
+The interface is responsive, so students can report and search from their phones with the same filters and cards.
+
 ## Technologies used
 
 - **Frontend:** React, Tailwind CSS, shadcn/ui, React Router
@@ -142,7 +179,7 @@ On startup the backend creates the admin account from `ADMIN_EMAIL` / `ADMIN_PAS
 ## Demo
 
 - **Demo link:** https://back2u1079.netlify.app
-- **Screenshots / video:** Will add soon
+- **Screenshots / video:** see the [Screenshots](#screenshots) section above
 
 ## Notes
 
