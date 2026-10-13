@@ -38,6 +38,60 @@ How it works:
 
 **Impact:** faster recoveries, fewer duplicate reports, verified ownership, a receipt and audit trail for every handover, and less repeated work for campus staff.
 
+## Live demo and how to access it
+
+- **Live app:** https://back2u1079.netlify.app
+- **Backend API (Render):** https://hacktoberfest26-hackday-submissions.onrender.com/api/ (interactive API docs at `/docs`)
+
+> **Note:** the backend runs on Render's free tier and sleeps when idle. The first request after a pause can take **30 to 60 seconds**. If the page seems stuck on first load or login, wait a minute and try again.
+
+### How to log in
+
+1. Open the live app and click **Log in / Sign up** in the top bar.
+2. Pick one of the access options:
+   - **Demo students (quickest):** on the login page, under "Hackathon demo mode", click **Alice**, **Bob** or **Carol**. No password is needed. Use two of them in separate browser windows (one normal, one private) to try the full lost-and-found flow between two people.
+   - **Your own account:** click **Sign up**, enter your name, email and password, and accept the Responsible Use Policy.
+   - **Admin:** the admin account is created from the server settings. The admin login is shared with reviewers on request and is not published here.
+
+## How to use the app
+
+**1. Report a lost item**
+1. Log in and choose **Report Lost** (or open `/report/lost`).
+2. Enter a title and description, and pick the colour and date.
+3. Choose where you lost it from the list of Mahindra University campus locations (Library, Hostel 4A, Dining-1, Soccer Field and so on).
+4. Optionally add photos. The app suggests a category and can autofill details from a photo.
+5. If a similar report already exists, a duplicate warning appears before you submit.
+6. Submit. The app immediately looks for found items that match.
+
+**2. Report a found item**
+1. Choose **Report Found** (or open `/report/found`).
+2. Fill in the same details and pick where you found it.
+3. Add private clues, such as a sticker or an engraving. They are never shown publicly and are only used to check the real owner.
+4. Choose where you will keep the item (for example, the Infra Office, Library or Health Care Centre).
+
+**3. Check your matches**
+1. Open **My Reports** and click a report.
+2. The matches panel lists possible matches with a score from 0 to 100 and the reasons behind it.
+
+**4. Claim an item and verify ownership**
+1. Open a found item from **Browse** or the community **Feed** and click **Claim**.
+2. Answer the verification questions about details only the owner would know. Claim attempts per day are limited.
+3. The finder reviews the claim and approves or rejects it.
+
+**5. Hand over the item**
+1. After approval, a handover page shows a single-use **QR code** that expires after 30 minutes.
+2. At the meeting, the other person scans it at **Handover Scan** (`/handover/scan`), and both people confirm.
+3. A **receipt** is created for both of you, and the item is marked as returned.
+
+**6. Stay informed**
+- **Watchlist:** save keywords, a category or locations to get a notification when a matching report appears.
+- **Notifications:** the bell icon shows matches, claim updates and watchlist alerts.
+
+**7. Admin tools** (admin account only, `/admin`)
+Moderate reports, handle misuse reports and appeals, suspend or ban users, manage locations and review the audit log.
+
+**Optional sample data:** to fill the app with sample reports, run `python seed.py` in `backend/` with the same `.env` values as the server. This is not needed to try the app.
+
 ## Technologies used
 
 - **Frontend:** React, Tailwind CSS, shadcn/ui, React Router
@@ -87,7 +141,7 @@ On startup the backend creates the admin account from `ADMIN_EMAIL` / `ADMIN_PAS
 
 ## Demo
 
-- **Demo link:** Will add soon
+- **Demo link:** https://back2u1079.netlify.app
 - **Screenshots / video:** Will add soon
 
 ## Notes
@@ -96,4 +150,5 @@ On startup the backend creates the admin account from `ADMIN_EMAIL` / `ADMIN_PAS
 - **Locations** come from the Mahindra University campus map. They are listed in `DEFAULT_LOCATIONS` in `backend/server.py` and synced to the database on startup. Admins can add more from the admin dashboard.
 - **Photo similarity** is only a hint and is never treated as proof of ownership. Private clues are never used in matching.
 - **Never commit `.env` files.** Use `backend/.env.example` as the template.
+- **Indoor location (planned):** we will add an option to record the exact place inside a building. For example, the Ecole Centrale School of Engineering has many rooms and classrooms, so a user will be able to pick the exact room (building, floor and room) with pinpoint accuracy instead of only the building. This will make matching more precise and help owners find their items faster.
 - **Future ideas:** email or SMS notifications, a mobile app, an interactive campus map for picking locations, integration with university ID login, and a better image model for detecting items like keys and ID cards.
